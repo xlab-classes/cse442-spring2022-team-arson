@@ -1,7 +1,17 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from account.forms import RegistrationForm, AccountAuthenticationForm
+from account.models import Account
 
+
+def home_screen_view(request):
+
+	context = {}
+
+	accounts = Account.objects.all()
+	context["accounts"] = accounts
+
+	return render(request, "account/home.html", context)
 
 ###########################################################
 def registration_view(request):
