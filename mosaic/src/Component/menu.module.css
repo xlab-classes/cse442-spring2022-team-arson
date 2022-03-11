@@ -4,10 +4,14 @@
   /* Menu Border */
 
   position: absolute;
+  display: flex;
+  flex-direction: column;
   width: 66.58px;
   height: 66.5px;
   left: 1304.5px;
   top: 40px;
+  justify-content: space-evenly;
+  align-items: center;
 
   background: #D9CFB7;
   border: 5px solid #65523D;
@@ -16,23 +20,25 @@
 .Line1 {
   /* Line 1 */
 
-  position: absolute;
+  position: flex;
   width: 35.51px;
   height: 0px;
   left: 1319.52px;
   top: 58.45px;
-
+  justify-content: space-evenly;
+  
   border: 3px solid #65523D;
 }
 
 .Line2 {
   /* Line 2 */
 
-  position: absolute;
+  position: flex;
   width: 35.51px;
   height: 0px;
   left: 1319.52px;
   top: 74.45px;
+  justify-content: space-evenly;
 
   border: 3px solid #65523D;
 }
@@ -40,11 +46,12 @@
 .Line3 {
   /* Line 3 */
 
-  position: absolute;
+  position: flex;
   width: 35.51px;
   height: 0px;
   left: 1319.52px;
   top: 90.45px;
+  justify-content: space-evenly;
 
   border: 3px solid #65523D;
 }

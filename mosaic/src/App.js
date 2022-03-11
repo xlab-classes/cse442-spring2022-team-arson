@@ -5,10 +5,11 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <div className={menu.Menu}></div>
-        <div className={menu.Line1}></div>
-        <div className={menu.Line2}></div>
-        <div className={menu.Line3}></div>
+        <div className={menu.Menu}>
+          <div className={menu.Line1}></div>
+          <div className={menu.Line2}></div>
+          <div className={menu.Line3}></div>
+        </div>
         <div className={menu.Rectangle1}>
           <text className={menu.Home}>HOME</text>
         </div>
