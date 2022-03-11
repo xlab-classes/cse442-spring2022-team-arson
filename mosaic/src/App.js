@@ -9,9 +9,18 @@ function App() {
         <div className={menu.Line1}></div>
         <div className={menu.Line2}></div>
         <div className={menu.Line3}></div>
-        <div className={menu.Rectangle1}></div>
-        <h className={menu.Home}></h>
-        <div className={menu.Rectangle2}></div>
+        <div className={menu.Rectangle1}>
+          <text className={menu.Home}>HOME</text>
+        </div>
+        <div className={menu.Rectangle2}>
+          <text className={menu.Profile}>PROFILE</text>
+        </div>
+        <div className={menu.Rectangle3}>
+          <text className={menu.Settings}>SETTINGS</text>
+        </div>
+        <div className={menu.Rectangle4}>
+          <text className={menu.Logout}>LOG OUT</text>
+        </div>
       </header>
     </div>
   );

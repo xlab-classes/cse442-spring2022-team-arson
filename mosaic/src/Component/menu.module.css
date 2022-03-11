@@ -1,11 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+
 .Menu {
   /* Menu Border */
 
   position: absolute;
   width: 66.58px;
   height: 66.5px;
-  left: 1312px;
-  top: 49px;
+  left: 1304.5px;
+  top: 40px;
 
   background: #D9CFB7;
   border: 5px solid #65523D;
@@ -17,10 +19,10 @@
   position: absolute;
   width: 35.51px;
   height: 0px;
-  left: 1327.02px;
-  top: 67.45px;
+  left: 1319.52px;
+  top: 58.45px;
 
-  border: 5px solid #65523D;
+  border: 3px solid #65523D;
 }
 
 .Line2 {
@@ -29,10 +31,10 @@
   position: absolute;
   width: 35.51px;
   height: 0px;
-  left: 1327.02px;
-  top: 83.47px;
+  left: 1319.52px;
+  top: 74.45px;
 
-  border: 5px solid #65523D;
+  border: 3px solid #65523D;
 }
 
 .Line3 {
@@ -41,10 +43,10 @@
   position: absolute;
   width: 35.51px;
   height: 0px;
-  left: 1327.02px;
-  top: 100.18px;
+  left: 1319.52px;
+  top: 90.45px;
 
-  border: 5px solid #65523D;
+  border: 3px solid #65523D;
 }
 
 .Rectangle1 {
@@ -53,28 +55,29 @@
   position: absolute;
   width: 152px;
   height: 47px;
-  left: 1237px;
-  top: 125px;
+  left: 1229px;
+  top: 113px;
 
   background: #D9CFB7;
   border: 5px solid #65523D;
   box-sizing: border-box;
+  z-index: auto;
 }
 
 .Home {
   /* HOME */
 
-  position: absolute;
+  position: flex;
   width: 58px;
   height: 32px;
-  left: 1276px;
-  top: 121px;
+  top: 125px;
 
   font-family: 'Roboto Mono';
-  font-style: normal;
+  font-style: bold;
   font-weight: 700;
   font-size: 24px;
   line-height: 32px;
+  z-index: auto;
 
   /* identical to box height */
 
@@ -87,10 +90,101 @@
   position: absolute;
   width: 152px;
   height: 48px;
-  left: 1237px;
-  top: 170px;
+  left: 1229px;
+  top: 155px;
 
   background: #D9CFB7;
   border: 5px solid #65523D;
   box-sizing: border-box;
+  z-index: auto;
+}
+
+.Profile {
+  /* PROFILE */
+
+  position: flex;
+  width: 101px;
+  height: 32px;
+  left: 1254px;
+  top: 163px;
+
+  font-family: 'Roboto Mono';
+  font-style: bold;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 32px;
+  z-index: auto;
+  /* identical to box height */
+
+  color: #65523D;
+}
+
+.Rectangle3 {
+  /* Rectangle 3 */
+
+  position: absolute;
+  width: 152px;
+  height: 43px;
+  left: 1229px;
+  top: 198px;
+
+  background: #D9CFB7;
+  border: 5px solid #65523D;
+  box-sizing: border-box;
+  z-index: auto;
+}
+
+.Settings {
+  /* SETTINGS */
+
+  position: flex;
+  width: 116px;
+  height: 32px;
+  left: 1247px;
+  top: 204px;
+
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 32px;
+  z-index: auto;
+  /* identical to box height */
+
+  color: #65523D;
+}
+
+.Rectangle4 {
+  /* Rectangle 4 */
+
+  position: absolute;
+  width: 152px;
+  height: 47px;
+  left: 1229px;
+  top: 236px;
+
+  background: #D9CFB7;
+  border: 5px solid #65523D;
+  box-sizing: border-box;
+  z-index: auto;
+}
+
+.Logout {
+  /* LOG OUT */
+
+  position: flex;
+  width: 101px;
+  height: 32px;
+  left: 1254px;
+  top: 244px;
+
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 32px;
+  z-index: auto;
+  /* identical to box height */
+
+  color: #65523D;
 }
