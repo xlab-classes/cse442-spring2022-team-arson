@@ -1,0 +1,96 @@
+.Menu {
+  /* Menu Border */
+
+  position: absolute;
+  width: 66.58px;
+  height: 66.5px;
+  left: 1312px;
+  top: 49px;
+
+  background: #D9CFB7;
+  border: 5px solid #65523D;
+}
+
+.Line1 {
+  /* Line 1 */
+
+  position: absolute;
+  width: 35.51px;
+  height: 0px;
+  left: 1327.02px;
+  top: 67.45px;
+
+  border: 5px solid #65523D;
+}
+
+.Line2 {
+  /* Line 2 */
+
+  position: absolute;
+  width: 35.51px;
+  height: 0px;
+  left: 1327.02px;
+  top: 83.47px;
+
+  border: 5px solid #65523D;
+}
+
+.Line3 {
+  /* Line 3 */
+
+  position: absolute;
+  width: 35.51px;
+  height: 0px;
+  left: 1327.02px;
+  top: 100.18px;
+
+  border: 5px solid #65523D;
+}
+
+.Rectangle1 {
+  /* Rectangle 1 */
+
+  position: absolute;
+  width: 152px;
+  height: 47px;
+  left: 1237px;
+  top: 125px;
+
+  background: #D9CFB7;
+  border: 5px solid #65523D;
+  box-sizing: border-box;
+}
+
+.Home {
+  /* HOME */
+
+  position: absolute;
+  width: 58px;
+  height: 32px;
+  left: 1276px;
+  top: 121px;
+
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 32px;
+
+  /* identical to box height */
+
+  color: #65523D;
+}
+
+.Rectangle2 {
+  /* Rectangle 2 */
+
+  position: absolute;
+  width: 152px;
+  height: 48px;
+  left: 1237px;
+  top: 170px;
+
+  background: #D9CFB7;
+  border: 5px solid #65523D;
+  box-sizing: border-box;
+}
