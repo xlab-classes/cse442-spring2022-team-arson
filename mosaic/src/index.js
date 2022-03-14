@@ -1,15 +1,34 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {BrowserRouter, Routes, Route} from "react-router-dom";
 import './index.css';
-import App from './App';
+import LogSign from './pages/logsign.js';
+import Login from './pages/login.js';
+import Signup from './pages/signup.js';
+import Settings from './pages/settings.js';
+import Menu from './Component/Menu.js';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+///////////////////////////////////////////////////////////////////////////////////////////////
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+const base = document.getElementById("base");
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+const App = () =>{
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route index element = {<LogSign />} />
+                <Route path = "login" element = {<Login />} />
+                <Route path = "signup" element = {<Signup />} />
+                <Route path = "settings" element = {<Settings />} />
+                <Route path = "menu" element = {<Menu />} />
+            </Routes>
+        </BrowserRouter>
+    );
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ReactDOM.render(<App />, base);
+
