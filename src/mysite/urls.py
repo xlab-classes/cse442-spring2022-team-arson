@@ -15,14 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from account.views import (
-    registration_view,
-    logout_view,
-    login_view,
-)
 
 #anytime a new route is created, it must be added here
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('account/', include('account.urls')),
+    path('', include('account.urls')),
 ]
