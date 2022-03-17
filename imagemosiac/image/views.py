@@ -3,12 +3,31 @@ from django.shortcuts import render
 
 from .forms import UploadForm
 
+from PIL import Image
+import os
+
 def upload(request):
     if request.method == 'POST':
         form = UploadForm(request.POST,request.FILES)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect('/upload/')
+            img = form.instance
+            # return HttpResponseRedirect('/upload/')
+            return render(request,'image.html',{'form':form,'img':img.image.url, 'msg': 'Successfully uploaded!'})
     else:
+        #localhost:8000/upload?edit=monochrome&filename=123.jpg
         form = UploadForm()
+        edit = request.GET.get('edit',None)
+        filename = request.GET.get('filename',None)
+        if filename and edit:
+            if edit == "monochrome":
+                cool = os.path.join(os.path.dirname(__file__),'images',filename)
+                img = Image.open(cool)
+                img = img.convert("L")    
+                # link = f'/images/monochrome/{filename}'
+                link = os.path.join(os.path.dirname(__file__),'images','monochrome',filename)
+                img.save(link)
+                return render(request,'image.html',{'form':form,'img': '/image/' + link,'msg':'monochromed'})
+        
+    form = UploadForm()
     return render(request,'image.html',{'form':form})
