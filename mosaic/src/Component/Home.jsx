@@ -18,16 +18,16 @@ class Home extends React.Component {
           <div className={menu.Line2}></div>
           <div className={menu.Line3}></div>
         </div>
-        <div className={menu.Rectangle1} hidden>
+        <div className={menu.Rectangle1}>
           <text className={menu.Home}>HOME</text>
         </div>
-        <div className={menu.Rectangle2} hidden>
+        <div className={menu.Rectangle2}>
           <text className={menu.Profile}>PROFILE</text>
         </div>
-        <div className={menu.Rectangle3} hidden>
+        <div className={menu.Rectangle3}>
           <text className={menu.Settings}>SETTINGS</text>
         </div>
-        <div className={menu.Rectangle4} hidden>
+        <div className={menu.Rectangle4}>
           <text className={menu.Logout}>LOG OUT</text>
         </div>
                 </header>

@@ -27,8 +27,8 @@
   /* MM Text */
   width: 346px;
   height: 63px;
-  left: 547px;
-  top: 58px;
+  left: 211px;
+  top: 17px;
 
   font-family: 'Roboto Mono';
   font-style: normal;
@@ -68,4 +68,5 @@
   top: 204px;
 
   border: 20px solid #65523D;
+  stroke-linecap: round;
 }
