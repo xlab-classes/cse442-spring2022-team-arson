@@ -2,8 +2,9 @@ import React from 'react';
 import {useParams} from "react-router-dom";
 import './profile.css'
 import Logo_Img from './Mosaic Maker.png';
-import {Rectangles2} from '../App.js';
-import App from '../Component/Menu'
+import Rectangles2 from './rectangles2';
+import App from '../Component/Menu.js';
+
 
 const Profile = () => {
     const {username} = useParams();
