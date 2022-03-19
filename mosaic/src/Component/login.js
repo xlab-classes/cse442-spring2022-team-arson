@@ -2,7 +2,7 @@ import React from 'react';
 import {Link} from "react-router-dom";
 import './login.css';
 import Logo_Img from './Mosaic Maker.png';
-import {Rectangles} from '../App.js';
+import Rectangles from './rectangles';
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

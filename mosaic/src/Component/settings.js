@@ -2,7 +2,7 @@ import React from 'react';
 import {Link} from "react-router-dom";
 import './settings.css';
 import Logo_Img from './Mosaic Maker.png';
-import {Rectangles2} from '../App.js';
+import Rectangles2 from './rectangles2';
 import App from '../Component/Menu'
 
 const Settings = () => {
