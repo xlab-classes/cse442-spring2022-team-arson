@@ -1,30 +1,43 @@
+import React from 'react';
 import './App.css';
-import menu from "./Component/menu.module.css";
 
-function App() {
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const Rectangles = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <div className={menu.Menu}>
-          <div className={menu.Line1}></div>
-          <div className={menu.Line2}></div>
-          <div className={menu.Line3}></div>
-        </div>
-        <div className={menu.Rectangle1}>
-          <text className={menu.Home}>HOME</text>
-        </div>
-        <div className={menu.Rectangle2}>
-          <text className={menu.Profile}>PROFILE</text>
-        </div>
-        <div className={menu.Rectangle3}>
-          <text className={menu.Settings}>SETTINGS</text>
-        </div>
-        <div className={menu.Rectangle4}>
-          <text className={menu.Logout}>LOG OUT</text>
-        </div>
-      </header>
-    </div>
-  );
+    <>
+    <div className = "Rectangle1"></div>
+    <div className = "Rectangle2"></div>
+    <div className = "Rectangle3"></div>
+    <div className = "Rectangle4"></div>
+    <div className = "Rectangle5"></div>
+    <div className = "Rectangle6"></div>
+    <div className = "Rectangle7"></div>
+    <div className = "Rectangle8"></div>
+    <div className = "Rectangle9"></div>
+    <div className = "Rectangle10"></div>
+    <div className = "Rectangle11"></div>
+    <div className = "Rectangle12"></div>
+    <div className = "Rectangle13"></div>
+    <div className = "Rectangle14"></div>
+    <div className = "Rectangle15"></div>
+    </>
+  )
 }
 
-export default App;
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const Rectangles2 = () => {
+  return (
+    <>
+    <div className = "Rec2_1"></div>
+    <div className = "Rec2_2"></div>
+    <div className = "Rec2_3"></div>
+    <div className = "Rec2_4"></div>
+    <div className = "Rec2_5"></div>
+    <div className = "Rec2_6"></div>
+    </>
+  )
+}
+
+export {Rectangles, Rectangles2};
