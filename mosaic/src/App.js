@@ -6,7 +6,8 @@ import Login from './Component/login.js';
 import Signup from './Component/signup.js';
 import Settings from './Component/settings.js';
 import SettingsUpdate from './Component/settings_update.js';
-import Profile from './Component/profile';
+import Profile from './Component/profile.js';
+import Home from './Component/Home.js';
 
 class App extends React.Component {
   render () {
@@ -14,6 +15,7 @@ class App extends React.Component {
       <Router basename={process.env.PUBLIC_URL}>
           <Routes>
               <Route path = "/" element = {<LogSign />} />
+              <Route path = "/home" element = {<Home/>} />
               <Route path = "/login" element = {<Login />} />
               <Route path = "/signup" element = {<Signup />} />
               <Route path = "/profile/user/:username" element = {<Profile />} />

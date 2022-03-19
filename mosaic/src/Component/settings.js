@@ -3,9 +3,10 @@ import {Link} from "react-router-dom";
 import './settings.css';
 import Logo_Img from './Mosaic Maker.png';
 import Rectangles2 from './rectangles2';
-import App from '../Component/Menu'
+import Menu from '../Component/Menu';
 
-const Settings = () => {
+class Settings extends React.Component {
+  render () {  
     return (
       <>
       <Rectangles2 />
@@ -29,9 +30,10 @@ const Settings = () => {
       <label className = "newPass2" for = "newPass2">RETYPE PASSWORD</label>
       <input type = "password" className = "passInput2" name = "newPass2"></input>
       <Link to = "/settings/updated"><input type = "submit" className = "updateButton" value = "SUBMIT"></input></Link>
-      <App />
+      <Menu />
       </>
-    )
+    );
   }
+}
 
 export default Settings;
