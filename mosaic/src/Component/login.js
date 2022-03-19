@@ -16,7 +16,7 @@ const Login = () => {
     <label className = "loginLabel" for = "username">USERNAME</label>
     <input type = "text" className = "loginUser" name = "username"></input>
     <label className = "loginLabel1" for = "password">PASSWORD</label>
-    <input type = "text" className = "loginPass" name = "password"></input>
+    <input type = "password" className = "loginPass" name = "password"></input>
     <input type = "submit" className = "loginButton" value = "LOGIN"></input>
     <Link to = "/"><button className = "backButton">BACK</button></Link>
     </>

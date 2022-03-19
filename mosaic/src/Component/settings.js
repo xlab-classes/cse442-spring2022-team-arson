@@ -25,9 +25,9 @@ const Settings = () => {
       <label className = "newUser2" for = "newUser2">RETYPE USERNAME</label>
       <input type = "text" className = "userInput2" name = "newUser2"></input>
       <label className = "newPass1" for = "newPass1">NEW PASSWORD</label>
-      <input type = "text" className = "passInput1" name = "newPass1"></input>
+      <input type = "password" className = "passInput1" name = "newPass1"></input>
       <label className = "newPass2" for = "newPass2">RETYPE PASSWORD</label>
-      <input type = "text" className = "passInput2" name = "newPass2"></input>
+      <input type = "password" className = "passInput2" name = "newPass2"></input>
       <Link to = "/settings/updated"><input type = "submit" className = "updateButton" value = "SUBMIT"></input></Link>
       <App />
       </>

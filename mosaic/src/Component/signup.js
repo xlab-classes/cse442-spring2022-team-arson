@@ -15,10 +15,10 @@ const Signup = () => {
     <label className = "signupLabel" for = "username">USERNAME</label>
     <input type = "text" className = "signupUser" name = "username"></input>
     <label className = "signupLabel1" for = "password">PASSWORD</label>
-    <input type = "text" className = "signupPass" name = "password"></input>
+    <input type = "password" className = "signupPass" name = "password"></input>
     <label className = "signupLabel2" for = "password">RETYPE PASSWORD</label>
-    <input type = "text" className = "signupPass2" name = "password2"></input>
-    <input type = "submit" className = "signupButton" value = "SIGNUP"></input>
+    <input type = "password" className = "signupPass2" name = "password2"></input>
+    <Link to = "/login"><input type = "submit" className = "signupButton" value = "SIGNUP"></input></Link>
     <Link to = "/"><button className = "backButton">BACK</button></Link>
     </>
   )
