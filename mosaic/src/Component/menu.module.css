@@ -30,7 +30,7 @@
   justify-content: space-evenly;
   
   border: 3px solid #65523D;
-  z-index: 3;
+  background-color: #65523D;
 }
 
 .Line2 {
@@ -44,6 +44,7 @@
   justify-content: space-evenly;
 
   border: 3px solid #65523D;
+  background-color: #65523D;
 }
 
 .Line3 {
@@ -57,6 +58,7 @@
   justify-content: space-evenly;
 
   border: 3px solid #65523D;
+  background-color: #65523D;
 }
 
 .Rectangle1 {

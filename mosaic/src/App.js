@@ -1,30 +1,29 @@
+import React from 'react';
+import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import './App.css';
-import menu from "./Component/menu.module.css";
+import LogSign from './Component/logsign.js';
+import Login from './Component/login.js';
+import Signup from './Component/signup.js';
+import Settings from './Component/settings.js';
+import SettingsUpdate from './Component/settings_update.js';
+import Profile from './Component/profile';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <div className={menu.Menu}>
-          <div className={menu.Line1}></div>
-          <div className={menu.Line2}></div>
-          <div className={menu.Line3}></div>
-        </div>
-        <div className={menu.Rectangle1}>
-          <text className={menu.Home}>HOME</text>
-        </div>
-        <div className={menu.Rectangle2}>
-          <text className={menu.Profile}>PROFILE</text>
-        </div>
-        <div className={menu.Rectangle3}>
-          <text className={menu.Settings}>SETTINGS</text>
-        </div>
-        <div className={menu.Rectangle4}>
-          <text className={menu.Logout}>LOG OUT</text>
-        </div>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  render () {
+    return (
+      <Router basename={process.env.PUBLIC_URL}>
+          <Routes>
+              <Route path = "/" element = {<LogSign />} />
+              <Route path = "/login" element = {<Login />} />
+              <Route path = "/signup" element = {<Signup />} />
+              <Route path = "/profile/user/:username" element = {<Profile />} />
+              <Route path = "/profile/" element = {<Profile />} />
+              <Route path = "/settings" element = {<Settings />} />
+              <Route path = "/settings/updated" element = {<SettingsUpdate />} />
+          </Routes>
+      </Router>
+    );
+  }
 }
 
 export default App;
