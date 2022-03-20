@@ -7,6 +7,18 @@ import Menu from "../Component/Menu";
 import Rectangles2 from './rectangles2';
 
 class Home extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      name: "React"
+    };
+    this.onChangeValue = this.onChangeValue.bind(this);
+  }
+
+
+  onChangeValue(event) {
+    console.log(event.target.value);
+  }
     render() {
         return (
             <div className={home.home}>
@@ -14,13 +26,48 @@ class Home extends React.Component {
                     <Rectangles2/>
                     <div className={home.logo}> <img src={logo} alt="logo"/></div>
                     <div className={home.titleBG}></div>
-                    <text className = {home.BannerText}>MOSAIC MAKER</text>
+                    <text className = {home.BannerText}>Mosaic Maker</text>
                     <div className = {home.Border}></div>
                 </header>
-
-
-
+                <div className={home.submission}>
+                  <div className={home.tabs}>
+                    <div className={home.uploadbox} >
+                      <text className={home.uploadtext}>UPLOAD</text>
+                    </div>
+                    <div className={home.keywordbox}>
+                      <text className={home.keywordtext}>KEYWORD</text>
+                    </div>
+                    <div className={home.randombox}>
+                      <text className={home.randomboxtext}>RANDOM</text>
+                    </div>
+                  </div>
+                  <div className={home.background}>
+                    <div className={home.uploadfield}>
+                      <div className={home.selections}>
+                        <input type="file" className={home.uploadinput}></input>
+                      </div>
+                      <div className={home.selections}>
+                        <text className={home.description}>Accepted file types: .png, .jpg, .jpeg</text>
+                      </div>
+                      <div className={home.selections} onChange={this.onChangeValue}>
+                        <input type="radio" name="privacy" value="Public" className={home.public}/><text className={home.publictext}>Public</text>
+                        <input type="radio" name="privacy" value="Private" className={home.private}/> <text className={home.privatetext}>Private</text>
+                      </div>
+                    </div>
+                    <button className={home.submit}>
+                      <text className={home.submittext}>SUBMIT</text>
+                    </button>
+                  </div>
+                </div>
                 <div className={home.Border2}></div>
+                <div className={home.recentimages}>
+                  <div className={home.recentimagestab}>
+                    <div className={home.recentimagesbox}>
+                      <text className={home.recentimagestext}>RECENT IMAGES</text>
+                    </div>
+                  </div>
+                  <div className={home.recentimagesBG}></div>
+                </div>
                 <Menu />
             </div>
         );
