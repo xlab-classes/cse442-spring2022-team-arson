@@ -5,6 +5,7 @@ import React from 'react';
 import logo from "../assets/MosaicMakerLogo.png";
 import Menu from "../Component/Menu";
 import Rectangles2 from './rectangles2';
+import {Link} from "react-router-dom";
 
 class Home extends React.Component {
   constructor() {
@@ -14,7 +15,6 @@ class Home extends React.Component {
     };
     this.onChangeValue = this.onChangeValue.bind(this);
   }
-
 
   onChangeValue(event) {
     console.log(event.target.value);
@@ -31,15 +31,21 @@ class Home extends React.Component {
                 </header>
                 <div className={home.submission}>
                   <div className={home.tabs}>
-                    <div className={home.uploadbox} >
-                      <text className={home.uploadtext}>UPLOAD</text>
-                    </div>
-                    <div className={home.keywordbox}>
-                      <text className={home.keywordtext}>KEYWORD</text>
-                    </div>
-                    <div className={home.randombox}>
-                      <text className={home.randomboxtext}>RANDOM</text>
-                    </div>
+                    <Link to = "/home/upload" style={{ textDecoration: 'none' }}>
+                      <div className={home.uploadboxselected} >
+                        <text className={home.uploadtext}>UPLOAD</text>
+                      </div>
+                    </Link>
+                    <Link to = "/home/keyword" style={{ textDecoration: 'none' }}>
+                      <div className={home.keywordbox}>
+                        <text className={home.keywordtext}>KEYWORD</text>
+                      </div>
+                    </Link>
+                    <Link to = "/home/random" style={{ textDecoration: 'none' }}>
+                      <div className={home.randombox}>
+                        <text className={home.randomboxtext}>RANDOM</text>
+                      </div>
+                    </Link>
                   </div>
                   <div className={home.background}>
                     <div className={home.uploadfield}>

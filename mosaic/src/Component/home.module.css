@@ -128,7 +128,7 @@
   align-items: flex-start;
 }
 
-.uploadbox {
+.uploadboxselected {
   position: absolute;
   width: 150px;
   height: 40px;
@@ -136,6 +136,16 @@
   cursor: pointer;
   
   background: #A38A6E;
+}
+
+.uploadbox {
+  position: absolute;
+  width: 150px;
+  height: 40px;
+  left: 11px;
+  cursor: pointer;
+  
+  background: #65523D;
 }
 
 .uploadtext {
@@ -152,6 +162,16 @@
   line-height: 32px;
 
   color: #FFFFFF;
+}
+
+.keywordboxselected {
+  position: absolute;
+  width: 150px;
+  height: 40px;
+  left: 166px;
+  cursor: pointer;
+
+  background: #A38A6E;
 }
 
 .keywordbox {
@@ -178,6 +198,16 @@
   line-height: 32px;
 
   color: #FFFFFF;
+}
+
+.randomboxselected {
+  position: absolute;
+  width: 150px;
+  height: 40px;
+  left: 321px;
+  cursor: pointer;
+
+  background: #A38A6E;
 }
 
 .randombox {
@@ -271,7 +301,10 @@
   width: 279px;
   height: 28px;
   position: relative;
-  
+
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-size: 12px;
   background: #D9CFB7;
   border: 3px solid #D9CFB7;
 }
@@ -362,6 +395,38 @@
   font-weight: 700;
   font-size: 24px;
   line-height: 32px;
+
+  color: #65523D;
+}
+
+.randomfield {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 332px;
+  height: 115px;
+  left: 283px;
+  top: 48px;
+}
+
+.randominput {
+  position: relative;
+  width: 332px;
+  height: 64px;
+  padding-bottom: 10px;
+}
+
+.randomtext {
+  position: relative;
+  width: 332px;
+  height: 64px;
+
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 32px;
+  text-align: center;
 
   color: #65523D;
 }
