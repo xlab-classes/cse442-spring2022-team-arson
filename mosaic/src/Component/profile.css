@@ -34,11 +34,11 @@
 
 .Border {
     position: absolute;
-    width: 1379px;
+    width: 1319px;
     height: 0px;
-    left: 31px;
-    top: 192px;
-
+    left: 60px;
+    top: 204px;
+  
     background: #65523D;
     border: 7px solid #65523D;
 }

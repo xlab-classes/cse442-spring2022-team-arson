@@ -13,7 +13,7 @@ class Profile extends React.Component {
             <Rectangles2 />
             <img className = "Logo2" src = {Logo_Img} alt = ""></img>
             <div className = "Banner"></div>
-            <text className = "BannerText">MOSAIC MAKER</text>
+            <text className = "BannerText">Mosaic Maker</text>
             <div className = "Border"></div>
 
             <div className = "profileBar"></div>

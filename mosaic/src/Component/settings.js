@@ -20,7 +20,7 @@ class Settings extends React.Component {
       <div className = "Box2"></div>
       
       <label className = "currentLabel" for = "currentPass">CURRENT PASSWORD</label>
-      <input type = "text" className = "currentInput" name = "currentPass"></input>
+      <input type = "password" className = "currentInput" name = "currentPass"></input>
       <label className = "newUser1" for = "newUser1">NEW USERNAME</label>
       <input type = "text" className = "userInput1" name = "newUser1"></input>
       <label className = "newUser2" for = "newUser2">RETYPE USERNAME</label>
