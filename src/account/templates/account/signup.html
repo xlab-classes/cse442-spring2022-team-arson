@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1> Signup</h1>
+<form method= "POST"> {% csrf_token %}
+
+	{% for field in registration_form %}
+	<p>
+		{{field.label_tag}}
+		{{field}}
+
+		{% if registration_form.help_text %}
+			<small style="color: grey;">{{field.help_text}}</small>
+		{% endif %}
+
+		{% for error in field.errors %}
+			<p style="color: red;">{{error}}</p>
+		{% endfor %}
+	</p>
+	{% endfor %}
+
+	<button type="submit">Register Now!</button>
+</form>
+
+{% endblock content %}

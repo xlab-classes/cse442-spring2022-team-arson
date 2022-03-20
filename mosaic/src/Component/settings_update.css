@@ -1,0 +1,14 @@
+.updateMessage {
+    position: absolute;
+    width: 325px;
+    height: 47px;
+    left: 557px;
+    top: 908px;
+
+    font-family: 'Roboto Mono';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 36px;
+    line-height: 47px;
+    color: #000000;
+}
