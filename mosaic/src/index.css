@@ -2,6 +2,7 @@ body {
     position: relative;
     width: 1440px;
     height: 1024px;
+    display: flex;
 
     background-color: #FAF1E1;
 
