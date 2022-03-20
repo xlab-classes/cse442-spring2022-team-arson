@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1> Change User Info</h1>
+<form method= "POST"> 
+
+	{% csrf_token %}
+
+	{% for field in u_form %}
+	<p>
+		{{field.label_tag}}
+		{{field}}
+
+		{% if u_form.help_text %}
+			<small style="color: grey;">{{field.help_text}}</small>
+		{% endif %}
+
+		{% for error in field.errors %}
+			<p style="color: red;">{{error}}</p>
+		{% endfor %}
+	</p>
+	{% endfor %}
+
+	<button type="submit">Submit Changes</button>
+</form>
+
+{% endblock content %}

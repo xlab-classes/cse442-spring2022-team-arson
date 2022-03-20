@@ -1,7 +1,21 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm, UserChangeForm
 from account.models import Account
 from django.contrib.auth import authenticate
+
+
+class ChangeUsernameForm(UserChangeForm):
+	# username = forms.CharField(max_length=25, help_text="Required. Enter a valid username")
+	class Meta:
+		model = Account 
+		fields = ("username",)
+
+
+# class AccountUpdateForm(forms.ModelForm):
+# 	username = forms.CharField(max_length=25, help_text="Required. Enter a valid username")
+# 	class Meta:
+# 		model = Account
+# 		fields = ("username", "password")
 
 
 class RegistrationForm(UserCreationForm):
@@ -10,7 +24,6 @@ class RegistrationForm(UserCreationForm):
 	class Meta:
 		model = Account
 		fields = ("username", "password1", "password2")
-
 
 class AccountAuthenticationForm(forms.ModelForm):
 	password = forms.CharField(label='Password', widget=forms.PasswordInput)
