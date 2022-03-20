@@ -6,6 +6,10 @@ from .forms import UploadForm
 from PIL import Image
 import os
 
+# def edit():
+    # pass
+
+# TODO: Add user specific features.
 def upload(request):
     if request.method == 'POST':
         form = UploadForm(request.POST,request.FILES)
@@ -13,6 +17,7 @@ def upload(request):
             form.save()
             img = form.instance
             # return HttpResponseRedirect('/upload/')
+            # print(img.image.url)
             return render(request,'image.html',{'form':form,'img':img.image.url, 'msg': 'Successfully uploaded!'})
     else:
         #localhost:8000/upload?edit=monochrome&filename=123.jpg
@@ -21,6 +26,10 @@ def upload(request):
         filename = request.GET.get('filename',None)
         if filename and edit:
             if edit == "monochrome":
+                print(filename)
+                if filename.startswith('/image'):
+                    filename = filename.split('/')[3]
+                print(filename)
                 cool = os.path.join(os.path.dirname(__file__),'images',filename)
                 img = Image.open(cool)
                 img = img.convert("L")    
