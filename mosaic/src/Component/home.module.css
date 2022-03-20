@@ -430,3 +430,40 @@
 
   color: #65523D;
 }
+
+.keywordfield {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 279px;
+  height: 78px;
+  left: 309px;
+  top: 40px;
+  padding-bottom: 37px;
+}
+
+.keywordbigtext {
+  width: 274px;
+  height: 32px;
+
+  
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 32px;
+
+  color: #65523D;
+}
+
+.keywordinput {
+  width: 279px;
+  height: 28px;
+  position: relative;
+
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-size: 20px;
+  background: #D9CFB7;
+  border: 3px solid #D9CFB7;
+}
