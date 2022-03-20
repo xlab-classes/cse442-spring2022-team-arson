@@ -8,6 +8,8 @@ import Settings from './Component/settings.js';
 import SettingsUpdate from './Component/settings_update.js';
 import Profile from './Component/profile.js';
 import Home from './Component/Home.js';
+import HomeRandom from './Component/HomeRandom.js';
+import HomeKeyword from './Component/HomeKeyword.js';
 
 class App extends React.Component {
   render () {
@@ -16,6 +18,9 @@ class App extends React.Component {
           <Routes>
               <Route path = "/" element = {<LogSign />} />
               <Route path = "/home" element = {<Home/>} />
+              <Route path = "/home/upload" element = {<Home/>} />
+              <Route path = "/home/keyword" element = {<HomeKeyword/>} />
+              <Route path = "/home/random" element ={<HomeRandom/>} />
               <Route path = "/login" element = {<Login />} />
               <Route path = "/signup" element = {<Signup />} />
               <Route path = "/profile/user/:username" element = {<Profile />} />
