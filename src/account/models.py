@@ -30,6 +30,7 @@ class AccountManager(BaseUserManager):
 class Account(AbstractBaseUser):
     # These fields are required for custom user class definitions
     username = models.CharField(max_length=25, unique=True)
+    password = models.CharField(max_length=25, unique=False)
     date_joined = models.DateTimeField(verbose_name="date_joined", auto_now_add=True)
     last_login = models.DateTimeField(verbose_name="last_login", auto_now=True)
     is_admin = models.BooleanField(default=False)

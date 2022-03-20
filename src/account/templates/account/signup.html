@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<h1> Register</h1>
+<h1> Signup</h1>
 <form method= "POST"> {% csrf_token %}
 
 	{% for field in registration_form %}
@@ -10,7 +10,7 @@
 		{{field.label_tag}}
 		{{field}}
 
-		{% if form.help_text %}
+		{% if registration_form.help_text %}
 			<small style="color: grey;">{{field.help_text}}</small>
 		{% endif %}
 
