@@ -1,5 +1,6 @@
 import '../App.css';
 import menu from "./menu.module.css";
+import {Link} from "react-router-dom";
 
 function App() {
   return (
@@ -13,15 +14,15 @@ function App() {
         <div className={menu.Rectangle1}>
           <text className={menu.Home}>HOME</text>
         </div>
-        <div className={menu.Rectangle2}>
+        <Link to = "/profile/user/test123"><div className={menu.Rectangle2}>
           <text className={menu.Profile}>PROFILE</text>
-        </div>
-        <div className={menu.Rectangle3}>
+        </div></Link>
+        <Link to = "/settings"><div className={menu.Rectangle3}>
           <text className={menu.Settings}>SETTINGS</text>
-        </div>
-        <div className={menu.Rectangle4}>
+        </div></Link>
+        <Link to = "/"><div className={menu.Rectangle4}>
           <text className={menu.Logout}>LOG OUT</text>
-        </div>
+        </div></Link>
       </header>
     </div>
   );
