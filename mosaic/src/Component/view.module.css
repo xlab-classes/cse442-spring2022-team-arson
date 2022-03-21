@@ -1,0 +1,192 @@
+.header {
+    position: absolute;
+    width: 1378.58px;
+    height: 179px;
+    left: 0px;
+    top: 0px;
+}
+  
+.titleBG {
+    position: absolute;
+    width: 767.5px;
+    height: 96.5px;
+    left: 336px;
+    top: 41px;
+  
+    background: #65523D;
+    border: 1px solid #65523D;
+  }
+  
+.title {
+    width: 346px;
+    height: 63px;
+    left: 211px;
+    top: 17px;
+  
+    font-family: 'Roboto Mono';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 63px;
+  
+    color: #FFFFFF;
+}
+  
+.logo {
+    position: absolute;
+    width: 179px;
+    height: 179px;
+    left: 0px;
+    top: 0px;
+  
+}
+
+.view {
+    display: flex;
+    position: relative;
+    width: 1440px;
+    height: 1024px;
+  
+    background: #FAF1E1;
+}
+
+.BannerText {
+    position: absolute;
+    width: 346px;
+    height: 63px;
+    left: 547px;
+    top: 58px;
+  
+    font-family: 'Roboto Mono';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 63px;
+    color: #FFFFFF;
+}
+  
+.Border {
+    position: absolute;
+    width: 1319px;
+    height: 0px;
+    left: 60px;
+    top: 204px;
+  
+    background: #65523D;
+    border: 7px solid #65523D;
+}
+
+.imageBox {
+    position: absolute;
+    width: 1041px;
+    height: 460.91px;
+    left: 199px;
+    top: 272px;
+    
+    background: #FFFFFF;
+    border: 15px solid #A38A6E;    
+}
+
+.infoBox {
+    position: absolute;
+    width: 610px;
+    height: 130px;
+    left: 415px;
+    top: 814px;
+
+    background: #D9CFB7;
+    border: 10px solid #65523D;
+}
+
+.infoText {
+    position: relative;
+    width: 173px;
+    height: 47px;
+    top: 5px;
+    left: 8px;
+
+    font-family: 'Roboto Mono';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 40px;
+    color: #000000;
+}
+
+.downloadButton {
+    position: absolute;
+    width: 266px;
+    height: 53px;
+    left: 1108px;
+    top: 814px;
+
+    cursor: pointer;
+    
+    background: #65523D;
+    border: 0px;
+}
+
+.downloadText {
+    width: 173px;
+    height: 47px;
+
+    font-family: 'Roboto Mono';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 36px;
+    line-height: 47px;
+    color: #FFFFFF;
+}
+
+.shareButton {
+    position: absolute;
+    width: 266px;
+    height: 53px;
+    left: 1108px;
+    top: 891px;
+
+    cursor: pointer;
+
+    background: #65523D;
+    border: 0px;
+}
+
+.shareText {
+    width: 109px;
+    height: 47px;
+
+    font-family: 'Roboto Mono';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 36px;
+    line-height: 47px;
+    color: #FFFFFF;
+}
+
+.privacyButton {
+    position: absolute;
+    width: 266px;
+    height: 53px;
+    left: 66px;
+    top: 814px;
+
+    cursor: pointer;
+
+    background: #65523D;
+    border: 0px;
+}
+
+.privacyText {
+    position: relative;
+    width: 130px;
+    height: 47px;
+    top: 3px;
+    left: 60px;
+
+    font-family: 'Roboto Mono';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 36px;
+    line-height: 47px;
+    color: #FFFFFF;
+}
