@@ -60,9 +60,11 @@ class HomeRandom extends React.Component {
                             <input type="radio" name="privacy" value="Private" className={home.private}/> <text className={home.privatetext}>Private</text>
                         </div>
                     </div>
+                    <Link to = "/results" style={{ textDecoration: 'none' }}>
                     <button className={home.submit}>
                       <text className={home.submittext}>SUBMIT</text>
                     </button>
+                    </Link>
                   </div>
                 </div>
                 <div className={home.Border2}></div>
