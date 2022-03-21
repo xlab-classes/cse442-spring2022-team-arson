@@ -4,7 +4,7 @@ import React from 'react';
 import logo from "../assets/MosaicMakerLogo.png";
 import Menu from "../Component/Menu";
 import Rectangles2 from './rectangles2';
-// import {Link} from "react-router-dom";
+import {Link} from "react-router-dom";
 
 class Results extends React.Component {
     render() {
@@ -26,9 +26,11 @@ class Results extends React.Component {
                     
                 </div>
 
+                <Link to = "/view" style={{ textDecoration: 'none' }}>
                 <button className = {results.uploadButton}>
                     <text className = {results.uploadText}>UPLOAD</text>
                 </button>
+                </Link>
 
                 <button className = {results.downloadButton}>
                     <text className = {results.downloadText}>DOWNLOAD</text>
