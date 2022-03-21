@@ -10,6 +10,7 @@ import Profile from './Component/profile.js';
 import Home from './Component/Home.js';
 import HomeRandom from './Component/HomeRandom.js';
 import HomeKeyword from './Component/HomeKeyword.js';
+import Results from './Component/Results.js';
 
 class App extends React.Component {
   render () {
@@ -27,6 +28,7 @@ class App extends React.Component {
               <Route path = "/profile/" element = {<Profile />} />
               <Route path = "/settings" element = {<Settings />} />
               <Route path = "/settings/updated" element = {<SettingsUpdate />} />
+              <Route path = "/results" element = {<Results />} />
           </Routes>
       </Router>
     );
