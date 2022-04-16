@@ -11,25 +11,25 @@ def get_db_connection():
     return conn
 
 upload = Blueprint('upload', __name__, template_folder='templates')
-upload.config = './uploads'
+# upload.config = './uploads' Not working for some old reason..
 
 @upload.route('/uploads/<filename>')
 def uploads(filename):
-    return send_from_directory(upload.config['UPLOAD_FOLDER'],filename)
+    return send_from_directory('./uploads',filename)
 
-@upload.route('/images/')
-def images():
-    # Post Form
+@upload.route("/home", methods = ('GET', 'POST'))
+def home():
     if request.method == "POST":
         legal = ['jpg','jpeg','png']
+        msg = ""
         if 'file' not in request.files:
             msg = "Nothing Found"
         else:    
             file = request.files['file']
             # See if extension is legal
             file_extension =  file.filename.rsplit('.',1)[1]
+            print(request.files)
             if file_extension in legal:
-
                 # file.read()
                 # Open file
                 # Insert commands here
@@ -40,45 +40,39 @@ def images():
 
                 # cursor.close()
                 # conn.close()
-
                 filename = f"{uuid4()}.{file_extension}"
+                print(filename)
                 # Save in folder
-                file.save(os.path.join(upload.config['UPLOAD_FOLDER'],filename))
-
-            render_template("upload.html")
+                file.save(os.path.join('./uploads',filename))
+                msg ="File uploaded!"
+            return render_template("upload.html",msg=msg,img=filename)
+        return render_template("upload.html",msg=msg)
+        
 
     elif request.method == "GET":
-        return render_template("upload.html")
-
-
-@upload.route("/home", methods = ('GET', 'POST'))
-def home():
-    if 'user' in session:
-        print(session['user'])
-    if request.method == "POST":
-        privacy = request.form['privacy']
-
-        print ("image status: " + privacy)
-
-        return redirect('/results')
+        if 'user' in session:
+            return render_template("upload.html",msg=f"welcome back! {session['user']}")
+        else:
+            return render_template("upload.html",msg=f"You are currently not logged in.")
+    
     return render_template("upload.html")
 
-@upload.route("/home/upload", methods = ('GET', 'POST'))
-def home_upload():
-    if request.method == "POST":
-        privacy = request.form['privacy']
 
-        print ("image status: " + privacy)
+# @upload.route('/mosiac/')
 
-        return redirect('/results')
-    return render_template("upload.html")
 
+# @upload.route('/sort')
 
 @upload.route("/profile")
 def profile():
     if 'user' in session:
         print(session['user'])
     return render_template("upload.html")
+
+@upload.route("/logout")
+def logout():
+    session.pop('user',None)
+    return redirect('/')
 
 # http://127.0.0.1:5000/home
 # http://127.0.0.1:5000/home/upload

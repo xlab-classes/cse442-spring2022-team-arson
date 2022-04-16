@@ -7,13 +7,18 @@
     <title>image mosiac</title>
 </head>
 <body>
-    <form enctype="multipart/form-data" action="/upload/" method="post">
-        <input type="file" name="" id="">
+    <a href="/home">home</a>
+    <a href="/profile">profile</a>
+    <a href="/logout">logout</a>
+    {% if msg %}
+        <h1>{{ msg }}</h1>
+    {% endif %}
+    <form enctype="multipart/form-data" action="/home" method="post">
+        <input type="file" name="file">
         <input type="submit" value="Submit">
     </form>
     {% if img %}
-        <h1>{{ msg }}</h1>
-        <img src="{{ img }}" alt="" srcset="">
+        <img src="/uploads/{{ img }}" alt="" srcset="">
         <br>
         <a href="/upload?edit=monochrome&filename={{ img }}">monochrome</a>
     {% endif %}
