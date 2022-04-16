@@ -1,9 +1,12 @@
 import sqlite3
-from flask import (Flask, render_template, request, redirect)
+from flask import (Flask, render_template, request, redirect, session)
+from upload import upload
 
 local_user = ""
 
 app = Flask(__name__)
+app.register_blueprint(upload)
+app.secret_key = "qwetrtyrefgdsljk" # Change this
 
 def get_db_connection():
     conn = sqlite3.connect('../database/database.db')
@@ -31,6 +34,8 @@ def login():
         if (len(all_users) > 0):
             global local_user
             local_user = username
+            
+            session['user'] = local_user
 
             return redirect('/home')
     return render_template("index.html")
@@ -60,25 +65,7 @@ def signup():
             conn.close()
     return render_template('index.html')
 
-@app.route("/home", methods = ('GET', 'POST'))
-def home():
-    if request.method == "POST":
-        privacy = request.form['privacy']
-
-        print ("image status: " + privacy)
-
-        return redirect('/results')
-    return render_template("index.html")
-
-@app.route("/home/upload", methods = ('GET', 'POST'))
-def home_upload():
-    if request.method == "POST":
-        privacy = request.form['privacy']
-
-        print ("image status: " + privacy)
-
-        return redirect('/results')
-    return render_template("index.html")
+# Moved home and home/upload to upload.py
 
 @app.route("/home/keyword", methods = ('GET', 'POST'))
 def home_keyword():
@@ -100,9 +87,7 @@ def home_random():
         return redirect('/results')
     return render_template("index.html")
 
-@app.route("/profile/")
-def profile():
-    return render_template("index.html")
+# Moved profile to upload.py
 
 @app.route("/settings")
 def settings():
