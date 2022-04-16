@@ -15,7 +15,7 @@ class MenuShow extends React.Component {
             </div>
           </Link>
           {/*Link to profile*/}
-          <Link to = "/profile/user/test123" style={{ textDecoration: 'none' }}>
+          <Link to = "/profile/" style={{ textDecoration: 'none' }}>
             <div className={menu2.Rectangle2}>
               <text className={menu2.Profile}>PROFILE</text>
             </div>

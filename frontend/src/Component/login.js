@@ -15,11 +15,13 @@ class Login extends React.Component {
       <div className = "Box"></div>
       <img className = "Logo1" src = {Logo_Img} alt = ""></img>
       <h1 className = "Heading">WELCOME BACK</h1>
-      <label className = "loginLabel" for = "username">USERNAME</label>
-      <input type = "text" className = "loginUser" name = "username"></input>
-      <label className = "loginLabel1" for = "password">PASSWORD</label>
-      <input type = "password" className = "loginPass" name = "password"></input>
-      <Link to = "/home"><input type = "submit" className = "loginButton" value = "LOGIN"></input></Link>
+      <form method = "post">
+        <label className = "loginLabel" for="username">USERNAME</label>
+        <input type="text" className = "loginUser" name="username"></input>
+        <label className = "loginLabel1" for="pass">PASSWORD</label>
+        <input type="password" className = "loginPass" name="pass"></input>
+        <button className = "loginButton" type="submit">LOGIN</button>
+      </form>
       <Link to = "/"><button className = "backButton">BACK</button></Link>
       </>
     );

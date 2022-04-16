@@ -26,11 +26,11 @@ class Results extends React.Component {
                     
                 </div>
 
-                <Link to = "/view" style={{ textDecoration: 'none' }}>
-                <button className = {results.uploadButton}>
-                    <text className = {results.uploadText}>UPLOAD</text>
-                </button>
-                </Link>
+                <form method = "post">
+                    <button className = {results.uploadButton}>
+                        <text className = {results.uploadText}>UPLOAD</text>
+                    </button>
+                </form>
 
                 <button className = {results.downloadButton}>
                     <text className = {results.downloadText}>DOWNLOAD</text>

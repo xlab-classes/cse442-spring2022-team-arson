@@ -55,16 +55,17 @@ class Home extends React.Component {
                       <div className={home.selections}>
                         <text className={home.description}>Accepted file types: .png, .jpg, .jpeg</text>
                       </div>
-                      <div className={home.selections} onChange={this.onChangeValue}>
-                        <input type="radio" name="privacy" value="Public" className={home.public}/><text className={home.publictext}>Public</text>
+                      <form className={home.selections} onChange={this.onChangeValue} method = "post">
+                        <input type="radio" name="privacy" value="Public" className={home.public} checked = "checked"/><text className={home.publictext}>Public</text>
                         <input type="radio" name="privacy" value="Private" className={home.private}/> <text className={home.privatetext}>Private</text>
-                      </div>
+                        <br></br>
+                        <div className={home.selections}>
+                          <button className={home.submit} type = "submit">
+                            <text className={home.submittext}>SUBMIT</text>
+                          </button>
+                        </div>
+                      </form>
                     </div>
-                    <Link to = "/results" style={{ textDecoration: 'none' }}>
-                    <button className={home.submit}>
-                      <text className={home.submittext}>SUBMIT</text>
-                    </button>
-                    </Link>
                   </div>
                 </div>
                 <div className={home.Border2}></div>

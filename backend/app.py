@@ -1,6 +1,8 @@
 import sqlite3
 from flask import (Flask, render_template, request, redirect)
 
+local_user = ""
+
 app = Flask(__name__)
 
 def get_db_connection():
@@ -9,6 +11,7 @@ def get_db_connection():
 
 @app.route("/")
 def index():
+    local_user = ""
     return render_template("index.html")
 
 @app.route("/login", methods = ('GET', 'POST'))
@@ -82,9 +85,9 @@ def home_keyword():
     if request.method == "POST":
         privacy = request.form['privacy']
 
-        print ("image status: " + privacy)
-
-        return redirect('/results')
+        if privacy:
+            return redirect('/results/' + privacy)
+            
     return render_template("index.html")
 
 @app.route("/home/random", methods = ('GET', 'POST'))
@@ -109,10 +112,37 @@ def settings():
 def settings_updated():
     return render_template("index.html")
 
-@app.route("/results")
-def results():
+@app.route("/results/<privacy>", methods = ('GET', 'POST'))
+def results(privacy):
+    if request.method == "POST":
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        newID = cursor.execute('SELECT MAX(imageID) FROM images').fetchall()[0][0] + 1
+
+        cursor.execute('INSERT INTO images (username, imageID, setting) VALUES (?, ?, ?)', (local_user, newID, privacy))
+        conn.commit()
+
+        images = cursor.execute('SELECT * FROM images').fetchall()
+        print(images)
+
+        cursor.close()
+        conn.close()
+
+        return redirect('/view/id/' + str(newID))
     return render_template("index.html")
 
-@app.route("/view")
-def view():
-    return render_template("index.html")
+@app.route("/view/id/<int:image_id>")
+def view(image_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    image_info = cursor.execute('SELECT * FROM images WHERE imageID = ?', (image_id,)).fetchall()
+
+    cursor.close()
+    conn.close()
+
+    if ((not image_info[0][0] == local_user) and (image_info[0][2] == "Private")):
+        return redirect('/home')
+
+    return render_template('index.html')

@@ -13,10 +13,10 @@ import HomeKeyword from './Component/HomeKeyword.js';
 import Results from './Component/Results.js';
 import View from './Component/View.js';
 
-class App extends React.Component {
-  render () {
-    return (
-      <Router basename={process.env.PUBLIC_URL}>
+function App() {
+  return (
+    <>
+      <Router>
           <Routes>
               <Route path = "/" element = {<LogSign />} />
               <Route path = "/home" element = {<Home/>} />
@@ -25,16 +25,15 @@ class App extends React.Component {
               <Route path = "/home/random" element ={<HomeRandom/>} />
               <Route path = "/login" element = {<Login />} />
               <Route path = "/signup" element = {<Signup />} />
-              <Route path = "/profile/user/:username" element = {<Profile />} />
               <Route path = "/profile/" element = {<Profile />} />
               <Route path = "/settings" element = {<Settings />} />
               <Route path = "/settings/updated" element = {<SettingsUpdate />} />
-              <Route path = "/results" element = {<Results />} />
-              <Route path = "/view" element = {<View />} />
+              <Route path = "/results/:privacy" element = {<Results />} />
+              <Route path = "/view/id/:id" element = {<View />} />
           </Routes>
       </Router>
-    );
-  }
+    </>
+  );
 }
 
 export default App;

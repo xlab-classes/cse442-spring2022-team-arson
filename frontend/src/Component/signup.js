@@ -13,13 +13,15 @@ class Signup extends React.Component {
       <Rectangles />
       <div className = "Box"></div>
       <img className = "Logo1" src = {Logo_Img} alt = ""></img>
-      <label className = "signupLabel" for = "username">USERNAME</label>
-      <input type = "text" className = "signupUser" name = "username"></input>
-      <label className = "signupLabel1" for = "password">PASSWORD</label>
-      <input type = "password" className = "signupPass" name = "password"></input>
-      <label className = "signupLabel2" for = "password">RETYPE PASSWORD</label>
-      <input type = "password" className = "signupPass2" name = "password2"></input>
-      <Link to = "/login"><input type = "submit" className = "signupButton" value = "SIGNUP"></input></Link>
+      <form method = "post">
+        <label className = "signupLabel" for="username">USERNAME</label>
+        <input type="text" className = "signupUser" name="username"></input>
+        <label className = "signupLabel1" for="pass">PASSWORD</label>
+        <input type="password" className = "signupPass" name="pass"></input>
+        <label className = "signupLabel2" for="pass2">RETYPE PASSWORD</label>
+        <input type="password" className = "signupPass2" name="pass2"></input>
+        <button className = "signupButton" type="submit">SIGNUP</button>
+      </form>
       <Link to = "/"><button className = "backButton">BACK</button></Link>
       </>
     );
