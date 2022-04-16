@@ -1,5 +1,6 @@
 {
   "files": {
+<<<<<<< HEAD
     "main.css": "/static/react/css/main.3ac9907e.css",
     "main.js": "/static/react/js/main.93cee8b8.js",
     "media/Mosaic Maker.png": "/static/react/media/Mosaic Maker.d20a0eb8774322ca46a9.png",
@@ -11,5 +12,18 @@
   "entrypoints": [
     "css/main.3ac9907e.css",
     "js/main.93cee8b8.js"
+=======
+    "main.css": "/CSE442-542/2022-Spring/cse-442u/static/css/main.6dc2c7d9.css",
+    "main.js": "/CSE442-542/2022-Spring/cse-442u/static/js/main.51ed4feb.js",
+    "static/media/Mosaic Maker.png": "/CSE442-542/2022-Spring/cse-442u/static/media/Mosaic Maker.d20a0eb8774322ca46a9.png",
+    "static/media/MosaicMakerLogo.png": "/CSE442-542/2022-Spring/cse-442u/static/media/MosaicMakerLogo.f621ec3deca230e371a1.png",
+    "index.html": "/CSE442-542/2022-Spring/cse-442u/index.html",
+    "main.6dc2c7d9.css.map": "/CSE442-542/2022-Spring/cse-442u/static/css/main.6dc2c7d9.css.map",
+    "main.51ed4feb.js.map": "/CSE442-542/2022-Spring/cse-442u/static/js/main.51ed4feb.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.6dc2c7d9.css",
+    "static/js/main.51ed4feb.js"
+>>>>>>> dev
   ]
 }
