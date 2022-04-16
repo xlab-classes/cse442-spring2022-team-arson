@@ -5,6 +5,8 @@ from exif import Image
 from uuid import uuid4
 import os
 import sqlite3
+from pain import CreateMosaic, getImages
+from PIL import Image
 
 def get_db_connection():
     conn = sqlite3.connect('../database/database.db')
@@ -30,16 +32,6 @@ def home():
             file_extension =  file.filename.rsplit('.',1)[1]
             print(request.files)
             if file_extension in legal:
-                # file.read()
-                # Open file
-                # Insert commands here
-                # conn = get_db_connection()
-                # cursor = conn.cursor()
-
-                # cursor.execute('INSERT * TO')
-
-                # cursor.close()
-                # conn.close()
                 filename = f"{uuid4()}.{file_extension}"
                 print(filename)
                 # Save in folder
@@ -58,7 +50,21 @@ def home():
     return render_template("upload.html")
 
 
-# @upload.route('/mosiac/')
+@upload.route('/uploads/mosiac/<filename>')
+def mosiac(filename):
+    # return send_from_directory
+    imgpath = Image.open(f"./uploads/{filename}")
+    anime = getImages('./static/images/')
+    resolution = (32,32)
+    mosiaced = CreateMosaic(imgpath,anime,resolution)
+    # print(mosiaced.size[1])
+    mosiaced.resize((800,int(mosiaced.size[1]*(800/mosiaced.size[0]))), Image.ANTIALIAS).save(f"./uploads/mosiac/{filename}")
+    return send_from_directory('./uploads/mosiac',filename)
+    # os.path.exists()
+
+@upload.route('/mosiac/<filename>')
+def pain(filename):
+    return render_template("upload.html",msg="mosiaced",img=f"/mosiac/{filename}")
 
 
 # @upload.route('/sort')
