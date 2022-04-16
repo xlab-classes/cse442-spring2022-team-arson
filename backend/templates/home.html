@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Mosaic Maker</title>
+</head>
+
+<body>
+    
+    {% block content %}
+        <h1>Home</h1>
+        <form method="post">
+            <label for="public">Public</label>
+            <input type="radio" name="img_setting"
+                value="public"></input>
+            <br>
+
+            <label for="private">Private</label>
+            <input type="radio" name="img_setting"
+                value="private"></input>
+            <br>
+
+            <button type="submit">Submit</button>
+        </form>
+    {% endblock %}
+   
+</body>
+
+</html>
