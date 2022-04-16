@@ -1,11 +1,8 @@
 import sqlite3
 from flask import (Flask, render_template, request, redirect)
 
-<<<<<<< HEAD
 local_user = ""
 
-=======
->>>>>>> dev
 app = Flask(__name__)
 
 def get_db_connection():
@@ -14,10 +11,7 @@ def get_db_connection():
 
 @app.route("/")
 def index():
-<<<<<<< HEAD
     local_user = ""
-=======
->>>>>>> dev
     return render_template("index.html")
 
 @app.route("/login", methods = ('GET', 'POST'))
@@ -91,15 +85,9 @@ def home_keyword():
     if request.method == "POST":
         privacy = request.form['privacy']
 
-<<<<<<< HEAD
         if privacy:
             return redirect('/results/' + privacy)
             
-=======
-        print ("image status: " + privacy)
-
-        return redirect('/results')
->>>>>>> dev
     return render_template("index.html")
 
 @app.route("/home/random", methods = ('GET', 'POST'))
@@ -124,7 +112,6 @@ def settings():
 def settings_updated():
     return render_template("index.html")
 
-<<<<<<< HEAD
 @app.route("/results/<privacy>", methods = ('GET', 'POST'))
 def results(privacy):
     if request.method == "POST":
@@ -159,12 +146,3 @@ def view(image_id):
         return redirect('/home')
 
     return render_template('index.html')
-=======
-@app.route("/results")
-def results():
-    return render_template("index.html")
-
-@app.route("/view")
-def view():
-    return render_template("index.html")
->>>>>>> dev
