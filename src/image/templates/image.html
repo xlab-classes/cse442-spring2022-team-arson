@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>image mosiace</title>
+    <title>image mosiac</title>
 </head>
 <body>
     <form enctype="multipart/form-data" action="/upload/" method="post">
@@ -17,6 +17,7 @@
         <img src="{{ img }}" alt="" srcset="">
         <br>
         <a href="/upload?edit=monochrome&filename={{ img }}">monochrome</a>
+        <a href="/upload?edit=mosaic&filename={{ img }}">mosaic</a>
     {% endif %}
 </body>
 </html>
