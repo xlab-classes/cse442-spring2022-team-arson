@@ -48,24 +48,22 @@ class Home extends React.Component {
                     </Link>
                   </div>
                   <div className={home.background}>
-                    <div className={home.uploadfield}>
+                    <form className={home.uploadfield} enctype="multipart/form-data" method = "post">
                       <div className={home.selections}>
-                        <input type="file" className={home.uploadinput}></input>
+                        <input type="file" className={home.uploadinput} name = "img"></input>
                       </div>
                       <div className={home.selections}>
                         <text className={home.description}>Accepted file types: .png, .jpg, .jpeg</text>
                       </div>
-                      <form className={home.selections} onChange={this.onChangeValue} method = "post">
-                        <input type="radio" name="privacy" value="Public" className={home.public} checked = "checked"/><text className={home.publictext}>Public</text>
-                        <input type="radio" name="privacy" value="Private" className={home.private}/> <text className={home.privatetext}>Private</text>
+                      <div className={home.selections} onChange={this.onChangeValue}>
+                        <input type="radio" name="privacy" value="public" className={home.public} checked = "checked"/><text className={home.publictext}>Public</text>
+                        <input type="radio" name="privacy" value="private" className={home.private}/> <text className={home.privatetext}>Private</text>
                         <br></br>
-                        <div className={home.selections}>
-                          <button className={home.submit} type = "submit">
-                            <text className={home.submittext}>SUBMIT</text>
-                          </button>
-                        </div>
-                      </form>
-                    </div>
+                        <button className={home.submit} type = "submit">
+                          <text className={home.submittext}>SUBMIT</text>
+                        </button>
+                      </div>
+                    </form>
                   </div>
                 </div>
                 <div className={home.Border2}></div>

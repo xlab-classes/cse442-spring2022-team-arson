@@ -56,9 +56,9 @@ class HomeRandom extends React.Component {
                         </div>
                         <div className={home.selections}></div>
                         <form className={home.selections} onChange={this.onChangeValue} method = "post">
-                            <input type="radio" name="privacy" value="Public" className={home.public} checked = "checked"/><text className={home.publictext}>Public</text>
-                            <input type="radio" name="privacy" value="Private" className={home.private}/> <text className={home.privatetext}>Private</text>
-                            <button className={home.submit} type = "submit">
+                            <input type="radio" name="privacy" value="public" className={home.public} checked = "checked"/><text className={home.publictext}>Public</text>
+                            <input type="radio" name="privacy" value="private" className={home.private}/> <text className={home.privatetext}>Private</text>
+                            <button className={home.submit} type = "submit" disabled>
                               <text className={home.submittext}>SUBMIT</text>
                             </button>
                         </form>

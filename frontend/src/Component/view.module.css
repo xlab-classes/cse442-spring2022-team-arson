@@ -170,8 +170,6 @@
     left: 66px;
     top: 814px;
 
-    cursor: pointer;
-
     background: #65523D;
     border: 0px;
 }
@@ -189,4 +187,78 @@
     font-size: 36px;
     line-height: 47px;
     color: #FFFFFF;
+}
+
+.public_input{
+    position: absolute;
+    width: 11px;
+    height: 11px;
+    left: 132px;
+    top: 889px;
+}
+
+.public{
+    position: absolute;
+    width: 87px;
+    height: 32px;
+    left: 171px;
+    top: 879px;
+
+    font-family: 'Roboto Mono';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 32px;
+    color: #000000;
+}
+
+.private_input{
+    position: absolute;
+    width: 11px;
+    height: 11px;
+    left: 132px;
+    top: 918px;
+}
+
+.private{
+    position: absolute;
+    width: 101px;
+    height: 32px;
+    left: 171px;
+    top: 908px;
+
+    font-family: 'Roboto Mono';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 32px;
+    color: #000000;
+}
+
+.update{
+    position: absolute;
+    width: 151px;
+    height: 37px;
+    left: 126px;
+    top: 947px;
+
+    background: #65523D;
+    cursor: pointer;
+
+    font-family: 'Roboto Mono';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 27px;
+    color: #FFFFFF;
+    text-align: center;
+    border: 0px;
+}
+
+.fImage {
+    display: block;
+    height: 461px;
+    width: auto;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
 }
