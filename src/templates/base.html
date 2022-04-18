@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title>This is the title</title>
+	<title>MosaicMaker</title>
 
 	{% if request.user.is_authenticated %}
 
@@ -16,7 +16,6 @@
 		<p><a href="{% url 'homepage' %}">Home</a></p>
 		<p> New Here? | <a href="{% url 'signup' %}">Signup</a></p>
 		<p> Returning User? | <a href="{% url 'login' %}">Login</a></p>
-
 	{% endif %}
 </head>
 

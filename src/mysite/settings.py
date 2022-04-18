@@ -20,7 +20,8 @@ environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+BACKEND_DIR = BASE_DIR
+FRONTEND_DIR = BASE_DIR.parent / 'mosaic'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -31,7 +32,7 @@ SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+# DEBUG = False
 ALLOWED_HOSTS = []
 
 
@@ -42,7 +43,7 @@ INSTALLED_APPS = [
     # My Apps
     'account.apps.AccountConfig',
     'image',
-    
+
     # Django Apps
     'django.contrib.admin',
     'django.contrib.auth',
@@ -67,7 +68,11 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [
+                # os.path.join(BASE_DIR, 'mosaic', 'build'),
+                os.path.join(BASE_DIR, 'templates'), #base.html
+                # os.path.join(FRONTEND_DIR / 'build'),
+                ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -89,10 +94,15 @@ AUTH_USER_MODEL = 'account.Account'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
+        # 'ENGINE': 'django.db.backends.mysql',
         'NAME': BASE_DIR / 'db.sqlite3',
+        # 'NAME': 'djangodatabase',
         'USER': env("DATABASE_USER"),
+        # 'USER': 'liammull',
         'PASSWORD': env("DATABASE_PASSWORD"),
+        # 'PASSWORD': '50268332',
         'HOST': env("DATABASE_HOST"),
+        # 'HOST': 'oceanus.cse.buffalo.edu',
     }
 }
 
@@ -131,14 +141,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    # os.path.join(BASE_DIR, 'mosaic', 'build', 'static'),
+    ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 MEDIA_ROOT = os.path.join(BASE_DIR,'image')
 
-MEDIA_URL = '/image/'
+MEDIA_URL = 'image/'
