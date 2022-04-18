@@ -1,4 +1,5 @@
 import sqlite3
+<<<<<<< HEAD
 import os
 from PIL import Image
 import numpy as np
@@ -13,13 +14,22 @@ folder_path = 'static/images/'
 app.config['UPLOAD_FOLDER'] = folder_path
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
+=======
+from flask import (Flask, render_template, request, redirect)
+
+app = Flask(__name__)
+
+>>>>>>> dev
 def get_db_connection():
     conn = sqlite3.connect('../database/database.db')
     return conn
 
 @app.route("/")
 def index():
+<<<<<<< HEAD
     local_user = ""
+=======
+>>>>>>> dev
     return render_template("index.html")
 
 @app.route("/login", methods = ('GET', 'POST'))
@@ -73,9 +83,15 @@ def home():
     if request.method == "POST":
         privacy = request.form['privacy']
 
+<<<<<<< HEAD
         if privacy:
             return redirect('/mosaicify/' + privacy + '/trew.png')
             
+=======
+        print ("image status: " + privacy)
+
+        return redirect('/results')
+>>>>>>> dev
     return render_template("index.html")
 
 @app.route("/home/upload", methods = ('GET', 'POST'))
@@ -83,9 +99,15 @@ def home_upload():
     if request.method == "POST":
         privacy = request.form['privacy']
 
+<<<<<<< HEAD
         if privacy:
             return redirect('/mosaicify/' + privacy + '/trew.png')
             
+=======
+        print ("image status: " + privacy)
+
+        return redirect('/results')
+>>>>>>> dev
     return render_template("index.html")
 
 @app.route("/home/keyword", methods = ('GET', 'POST'))
@@ -93,9 +115,15 @@ def home_keyword():
     if request.method == "POST":
         privacy = request.form['privacy']
 
+<<<<<<< HEAD
         if privacy:
             return redirect('/results/' + privacy)
             
+=======
+        print ("image status: " + privacy)
+
+        return redirect('/results')
+>>>>>>> dev
     return render_template("index.html")
 
 @app.route("/home/random", methods = ('GET', 'POST'))
@@ -120,6 +148,7 @@ def settings():
 def settings_updated():
     return render_template("index.html")
 
+<<<<<<< HEAD
 @app.route("/mosaicify/<privacy>/<user_image>")
 def mosaicify(privacy, user_image):
     # edit = request.GET.get('edit',None)
@@ -304,3 +333,12 @@ def CreateMosaic(target_image, input_images, resolution):
         MOSAIC.paste(output_images[i], (col * width, row * height))
 
     return MOSAIC
+=======
+@app.route("/results")
+def results():
+    return render_template("index.html")
+
+@app.route("/view")
+def view():
+    return render_template("index.html")
+>>>>>>> dev

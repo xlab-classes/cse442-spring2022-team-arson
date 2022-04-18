@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/static/react/css/main.f79446f7.css",
-    "main.js": "/static/react/js/main.fd42abfc.js",
+    "main.css": "/static/react/css/main.3ac9907e.css",
+    "main.js": "/static/react/js/main.93cee8b8.js",
     "media/Mosaic Maker.png": "/static/react/media/Mosaic Maker.d20a0eb8774322ca46a9.png",
     "media/MosaicMakerLogo.png": "/static/react/media/MosaicMakerLogo.f621ec3deca230e371a1.png",
     "../../templates/index.html": "/static/react/../../templates/index.html",
-    "main.f79446f7.css.map": "/static/react/css/main.f79446f7.css.map",
-    "main.fd42abfc.js.map": "/static/react/js/main.fd42abfc.js.map"
+    "main.3ac9907e.css.map": "/static/react/css/main.3ac9907e.css.map",
+    "main.93cee8b8.js.map": "/static/react/js/main.93cee8b8.js.map"
   },
   "entrypoints": [
-    "css/main.f79446f7.css",
-    "js/main.fd42abfc.js"
+    "css/main.3ac9907e.css",
+    "js/main.93cee8b8.js"
   ]
 }
