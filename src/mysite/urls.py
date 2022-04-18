@@ -21,7 +21,7 @@ from django.conf.urls.static import static
 #anytime a new route is created, it must be added here
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('account.urls')),
+    path('account/', include('account.urls')),
     path('upload/', include('image.urls')),
 ]
 

@@ -10,6 +10,7 @@ from account.forms import (
 	ChangeUsernameForm,
 )
 
+
 def home_screen_view(request):
 	context = {}
 
@@ -96,7 +97,7 @@ def change_password_view(request):
 	context["p_form"] = p_form
 	return render(request, 'account/change_password.html', context)
 ###########################################################
-@login_required
+# @login_required
 def change_username_view(request):
 	context = {}
 
@@ -110,6 +111,7 @@ def change_username_view(request):
 		
 		else:
 			messages.error(request, 'Please correct the error below.')
+			return redirect('login')
 	else:
 		u_form = ChangeUsernameForm(instance=request.user)
 		context["u_form"] = u_form

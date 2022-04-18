@@ -4,10 +4,11 @@ import React from 'react';
 import logo from "../assets/MosaicMakerLogo.png";
 import Menu from "../Component/Menu";
 import Rectangles2 from './rectangles2';
-import {Link} from "react-router-dom";
+import { useParams } from 'react-router-dom';
 
-class Results extends React.Component {
-    render() {
+const Results = () => {
+        const userimage = useParams()
+
         return (
             <div className={results.results}>
                 <header className={results.header}>
@@ -23,7 +24,7 @@ class Results extends React.Component {
                 </div>
 
                 <div className = {results.imageBox}>
-                    
+                    <img className = {results.resultImage} src={`/image/${userimage.userimage}`} alt="User Post"></img>
                 </div>
 
                 <form method = "post">
@@ -39,7 +40,6 @@ class Results extends React.Component {
                 <Menu />
             </div>
         );
-    } 
-}
+    }
 
 export default Results
