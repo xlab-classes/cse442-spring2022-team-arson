@@ -21,6 +21,7 @@ def get_db_connection():
 
 @app.route("/")
 def index():
+    global local_user
     local_user = ""
     return render_template("index.html")
 
@@ -72,6 +73,9 @@ def signup():
 
 @app.route("/home", methods = ('GET', 'POST'))
 def home():
+    if local_user == "":
+        return redirect('/')
+
     if request.method == "POST":
         privacy = request.form['privacy']
         image = request.files['img']
@@ -86,6 +90,9 @@ def home():
 
 @app.route("/home/upload", methods = ('GET', 'POST'))
 def home_upload():
+    if local_user == "":
+        return redirect('/')
+
     if request.method == "POST":
         privacy = request.form['privacy']
         image = request.files['img']
@@ -100,6 +107,9 @@ def home_upload():
 
 @app.route("/home/keyword", methods = ('GET', 'POST'))
 def home_keyword():
+    if local_user == "":
+        return redirect('/')
+
     if request.method == "POST":
         privacy = request.form['privacy']
 
@@ -110,6 +120,9 @@ def home_keyword():
 
 @app.route("/home/random", methods = ('GET', 'POST'))
 def home_random():
+    if local_user == "":
+        return redirect('/')
+
     if request.method == "POST":
         privacy = request.form['privacy']
 
@@ -118,20 +131,98 @@ def home_random():
         return redirect('/results')
     return render_template("index.html")
 
-@app.route("/profile/")
-def profile():
+@app.route("/myprofile")
+def profile_redirect():
+    if local_user == "":
+        return redirect('/')
+
+    return redirect('/profile/' + local_user)
+
+@app.route("/profile/<user>")
+def profile(user):
+    if local_user == "":
+        return redirect('/')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    poss_users = cursor.execute('SELECT * FROM users WHERE username = ?', (user,)).fetchall()
+
+    cursor.close()
+    conn.close()
+
+    if len(poss_users) == 0:
+        return redirect('/home')
+
     return render_template("index.html")
 
-@app.route("/settings")
+@app.route("/settings", methods = ('GET', 'POST'))
 def settings():
+    if local_user == "":
+        return redirect('/')
+
+    if request.method == "POST":
+        currentPass = request.form['currentPass']
+        newUser1 = request.form['newUser1']
+        newUser2 = request.form['newUser2']
+        newPass1 = request.form['newPass1']
+        newPass2 = request.form['newPass2']
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        pass_db = cursor.execute('SELECT pass FROM users WHERE username = ?', (local_user,)).fetchall()[0][0]
+
+        if not pass_db == currentPass:
+            return redirect('/settings')
+
+        if newUser1 and newUser2 and newPass1 and newPass2:
+            if not newUser1 == newUser2:
+                return redirect('/settings')
+            elif not newPass1 == newPass2:
+                return redirect('/settings')
+            cursor.execute('UPDATE users SET username = ?, pass = ? WHERE pass = ?', (newUser1, newPass1, currentPass))
+            conn.commit()
+            return redirect('/settings/updated')
+        
+        if newUser1 and newUser2:
+            if not newUser1 == newUser2:
+                return redirect('/settings')
+            
+            all_users = cursor.execute('SELECT * FROM users WHERE username = ?', (newUser1,)).fetchall()
+            if len(all_users) > 0:
+                return redirect('/settings')
+
+            cursor.execute('UPDATE users SET username = ? WHERE pass = ?', (newUser1, currentPass))
+            conn.commit()
+            return redirect('/settings/updated')
+
+        if newPass1 and newPass2:
+            if not newPass1 == newPass2:
+                return redirect('/settings')
+            cursor.execute('UPDATE users SET pass = ? WHERE pass = ?', (newPass1, currentPass))
+            conn.commit()
+            return redirect('/settings/updated')
+
+        cursor.close()
+        conn.close()
+
+        print(pass_db)
+
     return render_template("index.html")
 
 @app.route("/settings/updated")
 def settings_updated():
+    if local_user == "":
+        return redirect('/')
+
     return render_template("index.html")
 
 @app.route("/mosaicify/<privacy>/<user_image>")
 def mosaicify(privacy, user_image):
+    if local_user == "":
+        return redirect('/')
+
     filename = user_image
     image_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', filename))
     
@@ -162,6 +253,9 @@ def mosaicify(privacy, user_image):
 
 @app.route("/results/<privacy>/<user_image>", methods = ('GET', 'POST'))
 def results(privacy, user_image):
+    if local_user == "":
+        return redirect('/')
+
     if request.method == "POST":
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -182,10 +276,16 @@ def results(privacy, user_image):
 
 @app.route('/image/<path:filename>') 
 def send_file(filename):
+    if local_user == "":
+        return redirect('/')
+
     return send_from_directory('static', filename)
 
 @app.route('/id/<int:imageID>') 
 def send_file2(imageID):
+    if local_user == "":
+        return redirect('/')
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -198,6 +298,9 @@ def send_file2(imageID):
 
 @app.route("/view/id/<privacy>/<int:image_id>", methods = ('GET', 'POST'))
 def view(privacy, image_id):
+    if local_user == "":
+        return redirect('/')
+
     if request.method == "POST":
         new_privacy = request.form["privacy"]
 
