@@ -1,12 +1,25 @@
+import imghdr
+import json
 import sqlite3
-from flask import (Flask, render_template, request, redirect, session)
-from upload import upload
+import os
+import PIL
+from PIL import Image
+import numpy as np
+import urllib.request
+import datetime
+from flask import (Flask, render_template, request, redirect, send_from_directory, session)
+from werkzeug.utils import secure_filename
 
 local_user = ""
 
 app = Flask(__name__)
-app.register_blueprint(upload)
-app.secret_key = "qwetrtyrefgdsljk" # Change this
+
+folder_path = 'static/images/'
+app.config['UPLOAD_FOLDER'] = folder_path
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.secret_key = "amongus" # change to urandom later
+PIL.Image.MAX_IMAGE_PIXELS = 999999999
+
 
 def get_db_connection():
     conn = sqlite3.connect('../database/database.db')
@@ -34,8 +47,8 @@ def login():
         if (len(all_users) > 0):
             global local_user
             local_user = username
-            
-            session['user'] = local_user
+
+            session['username'] = username
 
             return redirect('/home')
     return render_template("index.html")
@@ -65,7 +78,42 @@ def signup():
             conn.close()
     return render_template('index.html')
 
-# Moved home and home/upload to upload.py
+@app.route("/home", methods = ('GET', 'POST'))
+def home():
+    if request.method == "POST":
+        privacy = request.form['privacy']
+        image = request.files['img']
+
+        if image:
+            image.save(os.path.join('static', image.filename))
+
+        if privacy:
+            return redirect('/mosaicify/' + privacy + '/' + image.filename)
+            
+    return render_template("index.html")
+
+@app.route("/home/upload", methods = ('GET', 'POST'))
+def home_upload():
+    if request.method == "POST":
+        privacy = request.form['privacy']
+        image = request.files['img']
+
+        if image:
+            image.save(os.path.join('static', image.filename))
+
+        if privacy:
+            return redirect('/mosaicify/' + privacy + '/' + image.filename)
+            
+    return render_template("index.html")
+
+# /home/upload -> mosiacify -> results
+# POST Request on /homeupload leads to redirects to mosiacfy than to results. The frontend renders based on the url params...
+# perhaps I should filter based on query as well? with addition with session cookie
+# Use fetch
+# dropdown with filter options date,color
+# Create dropdown in react dynamic with flask api fetch()? with cookie session
+# Also modify database
+# EXTRA EXTRA
 
 @app.route("/home/keyword", methods = ('GET', 'POST'))
 def home_keyword():
@@ -73,7 +121,7 @@ def home_keyword():
         privacy = request.form['privacy']
 
         if privacy:
-            return redirect('/results/' + privacy)
+            return redirect('/results/' + privacy + '/test.png')
             
     return render_template("index.html")
 
@@ -87,7 +135,56 @@ def home_random():
         return redirect('/results')
     return render_template("index.html")
 
-# Moved profile to upload.py
+@app.route("/profile/")
+def profile():
+    return render_template("index.html")
+
+@app.route("/profile/images")
+def profileimages():
+    print('Profile Stuff')
+    # Return the users profile 
+    # session['username'] = '123'
+    # username = session['username']
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Grab from new table here
+    userimages = cursor.execute('SELECT * FROM images WHERE username = ?', (session['username'],)).fetchall()
+    print(userimages)
+
+    # Create metadata if not any
+    for images in userimages:
+        imageID = images[1]
+        # print(imageID)
+        metadata = cursor.execute('SELECT * FROM meta WHERE imageID = ?',(imageID,)).fetchall()
+        if not metadata:
+            # userimages = cursor.execute('SELECT * FROM images WHERE imageID = ?', (imageID,)).fetchall()
+            # print(metadata)
+            filename = images[3]
+            image_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', filename))
+            size = os.path.getsize(image_path)
+            creation_time = os.path.getctime(image_path)
+            cursor.execute('INSERT INTO meta (dataname, data, imageID) VALUES (?, ?, ?)', ('size',str(size),imageID))
+            cursor.execute('INSERT INTO meta (dataname, data, imageID) VALUES (?, ?, ?)', ('ctime',str(int(creation_time)),imageID)) # Time to epoch
+            conn.commit()
+
+    # Retrieve metadata
+    dictionary = []
+    for images in userimages:
+        entry = {}
+        entry['imageID'] = images[1]
+        metadata = cursor.execute('SELECT * FROM meta WHERE imageID = ?',(images[1],)).fetchall()
+        for meta in metadata:
+            dataname, data = meta[0],meta[1]
+            entry[dataname] = data
+        dictionary.append(entry)
+
+    cursor.close()
+    conn.close()
+
+    return json.dumps(dictionary)
+
 
 @app.route("/settings")
 def settings():
@@ -97,28 +194,97 @@ def settings():
 def settings_updated():
     return render_template("index.html")
 
-@app.route("/results/<privacy>", methods = ('GET', 'POST'))
-def results(privacy):
+@app.route("/mosaicify/<privacy>/<user_image>")
+def mosaicify(privacy, user_image):
+    filename = user_image
+    image_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', filename))
+    
+    # image to be mosaic'd
+    target_image = Image.open(image_path)
+
+    # images to tile
+    input_images = getImages(folder_path)
+
+    # size of grid 
+    resolution = (64, 64)
+    # resolution = (256, 256)
+
+    # get largest image in input images
+    largest_image = max(input_images, key=lambda x: x.size[0] * x.size[1])
+
+    for img in input_images:
+        img.resize((target_image.size[0] // resolution[0], target_image.size[1] // resolution[1]), Image.LANCZOS)
+
+    output_mosaic = CreateMosaic(target_image, input_images, resolution)
+    print('Mosaic Complete!')
+
+    img_name = user_image.split('.')
+    new_img = img_name[0] + '_out.' + img_name[1]
+    link = os.path.join('static', new_img)
+    output_mosaic.save(link)
+    return redirect('/results/' + privacy + "/" + new_img)
+
+@app.route("/results/<privacy>/<user_image>", methods = ('GET', 'POST'))
+def results(privacy, user_image):
     if request.method == "POST":
+        print(session['username'])
         conn = get_db_connection()
         cursor = conn.cursor()
 
         newID = cursor.execute('SELECT MAX(imageID) FROM images').fetchall()[0][0] + 1
 
-        cursor.execute('INSERT INTO images (username, imageID, setting) VALUES (?, ?, ?)', (local_user, newID, privacy))
+        cursor.execute('INSERT INTO images (username, imageID, setting, imageName) VALUES (?, ?, ?, ?)', (session['username'], newID, privacy, user_image))
         conn.commit()
 
         images = cursor.execute('SELECT * FROM images').fetchall()
-        print(images)
 
         cursor.close()
         conn.close()
 
-        return redirect('/view/id/' + str(newID))
-    return render_template("index.html")
+        return redirect('/view/id/' + privacy + '/' + str(newID))
+    
+    return render_template('index.html')
 
-@app.route("/view/id/<int:image_id>")
-def view(image_id):
+@app.route('/image/<path:filename>') 
+def send_file(filename):
+    return send_from_directory('static', filename)
+
+@app.route('/id/<int:imageID>') 
+def send_file2(imageID):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    image_info = cursor.execute('SELECT * FROM images WHERE imageID = ?', (imageID,)).fetchall()
+
+    cursor.close()
+    conn.close()
+
+    # image_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', image_info[0][3]))
+    # imgpath = Image.open(image_path)
+    # imgpath.resize((600,600),Image.ANTIALIAS).save(f"./static/small_{image_info[0][3]}")
+    return send_from_directory('static', image_info[0][3])
+
+@app.route("/view/id/<privacy>/<int:image_id>", methods = ('GET', 'POST'))
+def view(privacy, image_id):
+    if request.method == "POST":
+        new_privacy = request.form["privacy"]
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        image_info = cursor.execute('SELECT * FROM images WHERE imageID = ?', (image_id,)).fetchall()
+
+        if not image_info[0][0] == local_user:
+            return redirect('/view/id/' + privacy + '/' + str(image_id))
+
+        cursor.execute('UPDATE images SET setting = ? WHERE imageID = ?', (new_privacy, image_id))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return redirect('/view/id/' + new_privacy + '/' + str(image_id))
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -127,7 +293,109 @@ def view(image_id):
     cursor.close()
     conn.close()
 
-    if ((not image_info[0][0] == local_user) and (image_info[0][2] == "Private")):
+    if ((not image_info[0][0] == local_user) and (image_info[0][2] == "private")):
         return redirect('/home')
 
     return render_template('index.html')
+
+#======================================================================================================
+
+def calcAverageRGB(image):
+
+    img = np.array(image)
+
+    # w - image width || h - image height || d - depth of colors, i.e. rgba = 4, rgb = 3
+    w, h, d = img.shape
+
+    # get average
+    # create linear array of d-tuple (3 for rgb) with length w*h for all pixels and average over each rgb tuple
+    return tuple(np.average(img.reshape(w * h, d), axis=0))
+
+def tileImage(image, size):
+    """
+    _________________
+    |_1_|_2_|_3_|_4_|
+    |_5_|_6_|_7_|_8_|
+    |_9_|_._|_._|_._|
+    |_._|_._|_._|_._|
+    |_._|_._|_._|_._|
+    gridify the image, return this as a list of individual images
+    """
+    m, n = size
+    w, h = image.size[0] // n, image.size[1] // m
+    imgs = []
+    for j in range(m):
+        for i in range(n):
+            chunk = image.crop((i * w, j * h, (i + 1) * w, (j + 1) * h))
+            imgs.append(chunk)
+    return imgs
+
+def getImages(imageDir):
+    files = os.listdir(imageDir)
+    imgs = []
+    for file in files:
+        # get absolute path of image, need to join with /images/filename
+        filePath = os.path.abspath(os.path.join(imageDir, file))
+        try:
+            fp = open(filePath, "rb")
+            im = Image.open(fp)
+            im.load()
+            imgs.append(im)
+            fp.close()
+        except Exception:
+            print(f"Error loading image: {file}")
+
+    # return a list of all the images in the folder
+    return imgs
+
+def findClosestMatch(input_avg, avgs):
+
+    index = 0                # current index
+    min_index = 0            # index of running min avg.
+    min_dist = float('inf')  # starting dist at infinity so first image check starts the tracking
+
+    # calculate euclidean distance w.r.t the RGB color-space (3-dim)
+    # track the minimum distance to get the image w closest avg color
+    for sample in avgs:
+        dist = (((sample[0] - input_avg[0]) ** 2) +
+                ((sample[1] - input_avg[1]) ** 2) +
+                ((sample[2] - input_avg[2]) ** 2))
+        # if lower dist found, update min trackers
+        if dist < min_dist:
+            min_dist = dist
+            min_index = index
+
+        index += 1
+
+    return min_index
+
+def CreateMosaic(target_image, input_images, resolution):
+
+    target_grid = tileImage(target_image, resolution)
+    output_images = []
+
+    # calculate average RGB for all the images
+    avgs = []
+    for img in input_images:
+        avgs.append(calcAverageRGB(img))
+
+    # calculate average RGB for each chunk of target image
+    # find the closest image
+    # add that image to the output images
+    for img in target_grid:
+        avg = calcAverageRGB(img)
+        match_index = findClosestMatch(avg, avgs)
+        output_images.append(input_images[match_index])
+
+    # create new image with dimensions = mosaic resolution * largest of the images
+    m, n = resolution
+    width, height = max([img.size[0] for img in output_images]), max([img.size[1] for img in output_images])
+    MOSAIC = Image.new('RGB', size=(n * width, m * height))
+
+    # tile images onto original image
+    for i in range(len(output_images)):
+        row = int(i / n)
+        col = i - n * row
+        MOSAIC.paste(output_images[i], (col * width, row * height))
+
+    return MOSAIC
