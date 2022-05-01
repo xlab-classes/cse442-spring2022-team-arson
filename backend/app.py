@@ -1,10 +1,13 @@
 import imghdr
+import json
 import sqlite3
 import os
+import PIL
 from PIL import Image
 import numpy as np
 import urllib.request
-from flask import (Flask, render_template, request, redirect, send_from_directory)
+import datetime
+from flask import (Flask, render_template, request, redirect, send_from_directory, session)
 from werkzeug.utils import secure_filename
 
 local_user = ""
@@ -14,6 +17,9 @@ app = Flask(__name__)
 folder_path = 'static/images/'
 app.config['UPLOAD_FOLDER'] = folder_path
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.secret_key = "amongus" # change to urandom later
+PIL.Image.MAX_IMAGE_PIXELS = 999999999
+
 
 def get_db_connection():
     conn = sqlite3.connect('../database/database.db')
@@ -42,6 +48,8 @@ def login():
         if (len(all_users) > 0):
             global local_user
             local_user = username
+
+            session['username'] = username
 
             return redirect('/home')
     return render_template("index.html")
@@ -131,30 +139,56 @@ def home_random():
         return redirect('/results')
     return render_template("index.html")
 
-@app.route("/myprofile")
-def profile_redirect():
-    if local_user == "":
-        return redirect('/')
+@app.route("/profile/")
+def profile():
+    return render_template("index.html")
 
-    return redirect('/profile/' + local_user)
-
-@app.route("/profile/<user>")
-def profile(user):
-    if local_user == "":
-        return redirect('/')
+@app.route("/profile/images")
+def profileimages():
+    print('Profile Stuff')
+    # Return the users profile 
+    # session['username'] = '123'
+    # username = session['username']
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    poss_users = cursor.execute('SELECT * FROM users WHERE username = ?', (user,)).fetchall()
+    # Grab from new table here
+    userimages = cursor.execute('SELECT * FROM images WHERE username = ?', (session['username'],)).fetchall()
+    print(userimages)
+
+    # Create metadata if not any
+    for images in userimages:
+        imageID = images[1]
+        # print(imageID)
+        metadata = cursor.execute('SELECT * FROM meta WHERE imageID = ?',(imageID,)).fetchall()
+        if not metadata:
+            # userimages = cursor.execute('SELECT * FROM images WHERE imageID = ?', (imageID,)).fetchall()
+            # print(metadata)
+            filename = images[3]
+            image_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', filename))
+            size = os.path.getsize(image_path)
+            creation_time = os.path.getctime(image_path)
+            cursor.execute('INSERT INTO meta (dataname, data, imageID) VALUES (?, ?, ?)', ('size',str(size),imageID))
+            cursor.execute('INSERT INTO meta (dataname, data, imageID) VALUES (?, ?, ?)', ('ctime',str(int(creation_time)),imageID)) # Time to epoch
+            conn.commit()
+
+    # Retrieve metadata
+    dictionary = []
+    for images in userimages:
+        entry = {}
+        entry['imageID'] = images[1]
+        metadata = cursor.execute('SELECT * FROM meta WHERE imageID = ?',(images[1],)).fetchall()
+        for meta in metadata:
+            dataname, data = meta[0],meta[1]
+            entry[dataname] = data
+        dictionary.append(entry)
 
     cursor.close()
     conn.close()
 
-    if len(poss_users) == 0:
-        return redirect('/home')
+    return json.dumps(dictionary)
 
-    return render_template("index.html")
 
 @app.route("/settings", methods = ('GET', 'POST'))
 def settings():
@@ -209,6 +243,9 @@ def settings():
 
         print(pass_db)
 
+
+@app.route("/settings")
+def settings():
     return render_template("index.html")
 
 @app.route("/settings/updated")
@@ -257,12 +294,15 @@ def results(privacy, user_image):
         return redirect('/')
 
     if request.method == "POST":
+        print(session['username'])
         conn = get_db_connection()
         cursor = conn.cursor()
 
         newID = cursor.execute('SELECT MAX(imageID) FROM images').fetchall()[0][0] + 1
 
         cursor.execute('INSERT INTO images (username, imageID, setting, imageName) VALUES (?, ?, ?, ?)', (local_user, newID, privacy, user_image))
+        cursor.execute('INSERT INTO images (username, imageID, setting, imageName) VALUES (?, ?, ?, ?)', (session['username'], newID, privacy, user_image))
+        
         conn.commit()
 
         images = cursor.execute('SELECT * FROM images').fetchall()
@@ -294,6 +334,9 @@ def send_file2(imageID):
     cursor.close()
     conn.close()
 
+    # image_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', image_info[0][3]))
+    # imgpath = Image.open(image_path)
+    # imgpath.resize((600,600),Image.ANTIALIAS).save(f"./static/small_{image_info[0][3]}")
     return send_from_directory('static', image_info[0][3])
 
 @app.route("/view/id/<privacy>/<int:image_id>", methods = ('GET', 'POST'))

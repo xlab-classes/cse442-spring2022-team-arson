@@ -99,7 +99,7 @@
 
 .filterChoice {
     position: absolute;
-    width: 87px;
+    width: 160px;
     height: 47px;
     left: 920px;
     top: 253px;
@@ -139,7 +139,7 @@
 
 .sortChoice {
     position: absolute;
-    width: 105px;
+    width: 160px;
     height: 47px;
     left: 1230px;
     top: 253px;
@@ -152,6 +152,8 @@
     color: #FFFFFF;
 }
 
+
+/* 15px solid #a38a6e */
 /***********************************************************************************************/
 
 .savedImages {
@@ -183,11 +185,85 @@
 .imageBox {
     position: absolute;
     width: 1000px;
-    height: 716px;
+    min-height: 716px;
     left: 410px;
     top: 308px;
 
     background: #FFFFFF;
     border: 15px solid #A38A6E;
     box-sizing: border-box;
+
+    z-index: -1;
 }
+
+.image {
+
+}
+
+/* hover Over Stuff */
+
+/* 65523D */
+/* why is the css hard coded? */
+.filterChoices {
+    position: absolute;
+    width: 87px;
+    height: 47px;
+    left: 920px;
+    top: 253px;
+
+    font-family: 'Roboto Mono';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 36px;
+    line-height: 47px;
+    color: #FFFFFF;
+}
+
+img { 
+    height: 300px;
+    width: 300px;
+    display: inline-block;
+}
+
+.choice li {
+    position:relative;
+}
+
+.load {
+    position: absolute;
+    width: 300px;
+    height: 150px;
+    left: 33px;
+    top:545px;
+    background: #a38a6e;
+
+    font-family: 'Roboto Mono';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 36px;
+    line-height: 47px;
+    color: #FFFFFF;
+}
+
+.dropDown {
+    display: none;
+}
+
+.dropDown > button {
+    font-family: Roboto Mono;
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 47px;
+    
+    color: #FFFFFF;
+    background: #65523d;
+    width: 183px;
+}
+
+
+.filterChoice:hover .dropDown {display: block;}
+.sortChoice:hover .dropDown {display:block;}
+
+
+/* Dropdown CSS Stuff May change to javascript */

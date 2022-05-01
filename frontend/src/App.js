@@ -25,7 +25,7 @@ function App() {
               <Route path = "/home/random" element ={<HomeRandom/>} />
               <Route path = "/login" element = {<Login />} />
               <Route path = "/signup" element = {<Signup />} />
-              <Route path = "/profile/:user" element = {<Profile />} />
+              <Route path = "/profile/" element = {<Profile />} />
               <Route path = "/settings" element = {<Settings />} />
               <Route path = "/settings/updated" element = {<SettingsUpdate />} />
               <Route path = "/results/:privacy/:userimage" element = {<Results />} />
