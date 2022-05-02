@@ -1,10 +1,13 @@
 import imghdr
+import json
 import sqlite3
 import os
+import PIL
 from PIL import Image
 import numpy as np
 import urllib.request
-from flask import (Flask, render_template, request, redirect, send_from_directory)
+import datetime
+from flask import (Flask, render_template, request, redirect, send_from_directory, session)
 from werkzeug.utils import secure_filename
 from icrawler.builtin import GoogleImageCrawler
 from RandomWordGenerator import RandomWord
@@ -15,6 +18,9 @@ app = Flask(__name__)
 folder_path = 'static/images/'
 app.config['UPLOAD_FOLDER'] = folder_path
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.secret_key = "amongus" # change to urandom later
+PIL.Image.MAX_IMAGE_PIXELS = 999999999
+
 
 def get_db_connection():
     conn = sqlite3.connect('../database/database.db')
@@ -22,6 +28,7 @@ def get_db_connection():
 
 @app.route("/")
 def index():
+    global local_user
     local_user = ""
     return render_template("index.html")
 
@@ -42,6 +49,8 @@ def login():
         if (len(all_users) > 0):
             global local_user
             local_user = username
+
+            session['username'] = username
 
             return redirect('/home')
     return render_template("index.html")
@@ -73,6 +82,9 @@ def signup():
 
 @app.route("/home", methods = ('GET', 'POST'))
 def home():
+    if local_user == "":
+        return redirect('/')
+
     if request.method == "POST":
         privacy = request.form['privacy']
         image = request.files['img']
@@ -87,6 +99,10 @@ def home():
 
 @app.route("/home/upload", methods = ('GET', 'POST'))
 def home_upload():
+
+    if local_user == "":
+        return redirect('/')
+
 
     if request.method == "POST":
         privacy = request.form['privacy']
@@ -103,6 +119,9 @@ def home_upload():
 
 @app.route("/home/keyword", methods = ('GET', 'POST'))
 def home_keyword():
+    if local_user == "":
+        return redirect('/')
+
     if request.method == "POST":
         privacy = request.form['privacy']
 
@@ -117,6 +136,9 @@ def home_keyword():
 
 @app.route("/home/random", methods = ('GET', 'POST'))
 def home_random():
+    if local_user == "":
+        return redirect('/')
+
     if request.method == "POST":
         privacy = request.form['privacy']
         
@@ -135,16 +157,123 @@ def home_random():
 def profile():
     return render_template("index.html")
 
-@app.route("/settings")
+@app.route("/profile/images")
+def profileimages():
+    print('Profile Stuff')
+    # Return the users profile 
+    # session['username'] = '123'
+    # username = session['username']
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Grab from new table here
+    userimages = cursor.execute('SELECT * FROM images WHERE username = ?', (session['username'],)).fetchall()
+    print(userimages)
+
+    # Create metadata if not any
+    for images in userimages:
+        imageID = images[1]
+        # print(imageID)
+        metadata = cursor.execute('SELECT * FROM meta WHERE imageID = ?',(imageID,)).fetchall()
+        if not metadata:
+            # userimages = cursor.execute('SELECT * FROM images WHERE imageID = ?', (imageID,)).fetchall()
+            # print(metadata)
+            filename = images[3]
+            image_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', filename))
+            size = os.path.getsize(image_path)
+            creation_time = os.path.getctime(image_path)
+            cursor.execute('INSERT INTO meta (dataname, data, imageID) VALUES (?, ?, ?)', ('size',str(size),imageID))
+            cursor.execute('INSERT INTO meta (dataname, data, imageID) VALUES (?, ?, ?)', ('ctime',str(int(creation_time)),imageID)) # Time to epoch
+            conn.commit()
+
+    # Retrieve metadata
+    dictionary = []
+    for images in userimages:
+        entry = {}
+        entry['imageID'] = images[1]
+        metadata = cursor.execute('SELECT * FROM meta WHERE imageID = ?',(images[1],)).fetchall()
+        for meta in metadata:
+            dataname, data = meta[0],meta[1]
+            entry[dataname] = data
+        dictionary.append(entry)
+
+    cursor.close()
+    conn.close()
+
+    return json.dumps(dictionary)
+
+
+@app.route("/settings", methods = ('GET', 'POST'))
 def settings():
-    return render_template("index.html")
+    if local_user == "":
+        return redirect('/')
+
+    if request.method == "POST":
+        currentPass = request.form['currentPass']
+        newUser1 = request.form['newUser1']
+        newUser2 = request.form['newUser2']
+        newPass1 = request.form['newPass1']
+        newPass2 = request.form['newPass2']
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        pass_db = cursor.execute('SELECT pass FROM users WHERE username = ?', (local_user,)).fetchall()[0][0]
+
+        if not pass_db == currentPass:
+            return redirect('/settings')
+
+        if newUser1 and newUser2 and newPass1 and newPass2:
+            if not newUser1 == newUser2:
+                return redirect('/settings')
+            elif not newPass1 == newPass2:
+                return redirect('/settings')
+            cursor.execute('UPDATE users SET username = ?, pass = ? WHERE pass = ?', (newUser1, newPass1, currentPass))
+            conn.commit()
+            return redirect('/settings/updated')
+        
+        if newUser1 and newUser2:
+            if not newUser1 == newUser2:
+                return redirect('/settings')
+            
+            all_users = cursor.execute('SELECT * FROM users WHERE username = ?', (newUser1,)).fetchall()
+            if len(all_users) > 0:
+                return redirect('/settings')
+
+            cursor.execute('UPDATE users SET username = ? WHERE pass = ?', (newUser1, currentPass))
+            conn.commit()
+            return redirect('/settings/updated')
+
+        if newPass1 and newPass2:
+            if not newPass1 == newPass2:
+                return redirect('/settings')
+            cursor.execute('UPDATE users SET pass = ? WHERE pass = ?', (newPass1, currentPass))
+            conn.commit()
+            return redirect('/settings/updated')
+
+        cursor.close()
+        conn.close()
+
+        print(pass_db)
+
+
+# @app.route("/settings")
+# def settings():
+#     return render_template("index.html")
 
 @app.route("/settings/updated")
 def settings_updated():
+    if local_user == "":
+        return redirect('/')
+
     return render_template("index.html")
 
 @app.route("/mosaicify/<privacy>/<user_image>")
 def mosaicify(privacy, user_image):
+
+    if local_user == "":
+        return redirect('/')
 
     filename = user_image
     image_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', filename))
@@ -179,13 +308,19 @@ def mosaicify(privacy, user_image):
 
 @app.route("/results/<privacy>/<user_image>", methods = ('GET', 'POST'))
 def results(privacy, user_image):
+    if local_user == "":
+        return redirect('/')
+
     if request.method == "POST":
+        print(session['username'])
         conn = get_db_connection()
         cursor = conn.cursor()
 
         newID = cursor.execute('SELECT MAX(imageID) FROM images').fetchall()[0][0] + 1
 
         cursor.execute('INSERT INTO images (username, imageID, setting, imageName) VALUES (?, ?, ?, ?)', (local_user, newID, privacy, user_image))
+        cursor.execute('INSERT INTO images (username, imageID, setting, imageName) VALUES (?, ?, ?, ?)', (session['username'], newID, privacy, user_image))
+        
         conn.commit()
 
         images = cursor.execute('SELECT * FROM images').fetchall()
@@ -199,10 +334,16 @@ def results(privacy, user_image):
 
 @app.route('/image/<path:filename>') 
 def send_file(filename):
+    if local_user == "":
+        return redirect('/')
+
     return send_from_directory('static', filename)
 
 @app.route('/id/<int:imageID>') 
 def send_file2(imageID):
+    if local_user == "":
+        return redirect('/')
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -211,10 +352,16 @@ def send_file2(imageID):
     cursor.close()
     conn.close()
 
+    # image_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', image_info[0][3]))
+    # imgpath = Image.open(image_path)
+    # imgpath.resize((600,600),Image.ANTIALIAS).save(f"./static/small_{image_info[0][3]}")
     return send_from_directory('static', image_info[0][3])
 
 @app.route("/view/id/<privacy>/<int:image_id>", methods = ('GET', 'POST'))
 def view(privacy, image_id):
+    if local_user == "":
+        return redirect('/')
+
     if request.method == "POST":
         new_privacy = request.form["privacy"]
 
