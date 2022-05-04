@@ -242,10 +242,7 @@ def settings():
         conn.close()
 
         print(pass_db)
-
-
-@app.route("/settings")
-def settings():
+    
     return render_template("index.html")
 
 @app.route("/settings/updated")
@@ -301,8 +298,7 @@ def results(privacy, user_image):
         newID = cursor.execute('SELECT MAX(imageID) FROM images').fetchall()[0][0] + 1
 
         cursor.execute('INSERT INTO images (username, imageID, setting, imageName) VALUES (?, ?, ?, ?)', (local_user, newID, privacy, user_image))
-        cursor.execute('INSERT INTO images (username, imageID, setting, imageName) VALUES (?, ?, ?, ?)', (session['username'], newID, privacy, user_image))
-        
+
         conn.commit()
 
         images = cursor.execute('SELECT * FROM images').fetchall()
