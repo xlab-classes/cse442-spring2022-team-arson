@@ -10,7 +10,8 @@ import datetime
 from flask import (Flask, render_template, request, redirect, send_from_directory, session)
 from werkzeug.utils import secure_filename
 from icrawler.builtin import GoogleImageCrawler
-from RandomWordGenerator import RandomWord
+from icrawler import ImageDownloader
+from random_word import RandomWords
 local_user = ""
 
 app = Flask(__name__)
@@ -126,6 +127,7 @@ def home_keyword():
         privacy = request.form['privacy']
 
         key_word = "porkchop"
+        # key_word = request.form['text']
         image = RandomImageScrape(key_word)
 
         if privacy:
@@ -498,14 +500,35 @@ def CreateMosaic(target_image, input_images, resolution):
 
 #======================================================================================================
 
+class RandomDownloader(ImageDownloader):
+
+    def get_filename(self, task, default_ext):
+        filename = super(RandomDownloader, self).get_filename(
+            task, default_ext)
+        global key
+        filename = key + ".jpg"
+        return filename
+
+
 def RandomImageScrape(key_word=None):
-    google_crawler = GoogleImageCrawler(storage={'root_dir': 'static'})
+    google_crawler = GoogleImageCrawler(
+        downloader_cls=RandomDownloader,
+        storage={'root_dir': 'static'})
+
     if not key_word:
-        r = RandomWord()
-        key_word = r.generate()
+        r = RandomWords()
+        global key
+        key = r.get_random_word(
+            hasDictionaryDef="true",
+            includePartOfSpeech="noun, adverb",
+            minCorpusCount=1,
+            maxCorpusCount=100)
+        google_crawler.crawl(keyword=key, max_num=1) 
+        image = key + ".jpg"
+    else:
+        key = key_word
+        google_crawler.crawl(keyword=key, max_num=1) 
 
-    google_crawler.crawl(keyword=key_word, max_num=5) 
+        image = key + ".jpg"
 
-    filename = '000003.jpg'
-
-    return filename
+    return image
