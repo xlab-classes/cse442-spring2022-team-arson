@@ -9,6 +9,7 @@ import urllib.request
 import datetime
 from flask import (Flask, render_template, request, redirect, send_from_directory, session)
 from werkzeug.utils import secure_filename
+from flask_mysqldb import MySQL
 
 app = Flask(__name__)
 
@@ -18,6 +19,10 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.secret_key = "amongus" # change to urandom later
 PIL.Image.MAX_IMAGE_PIXELS = 999999999
 
+app.config['MYSQL_HOST'] = 'oceanus.cse.buffalo.edu'
+app.config['MYSQL_USER'] = 'jhhou'
+app.config['MYSQL_PASSWORD'] = '50292168'
+app.config['MYSQL_DB'] = 'cse442_2022_spring_team_u_db'
 
 def get_db_connection():
     conn = sqlite3.connect('../database/database.db')
