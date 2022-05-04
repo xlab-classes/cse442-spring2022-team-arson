@@ -31,8 +31,6 @@ def get_db_connection():
 
 @app.route("/")
 def index():
-    if session['username']:
-        return redirect('/home')
     return render_template("index.html")
 
 @app.route("/login", methods = ('GET', 'POST'))
@@ -240,7 +238,7 @@ def settings():
                 return redirect('/settings')
             elif not newPass1 == newPass2:
                 return redirect('/settings')
-            cursor.execute('UPDATE users SET username = %s, pass = %s WHERE pass = %s', (newUser1, newPass1, currentPass))
+            cursor.execute('UPDATE users SET username = %s, pass = %s WHERE username = %s', (newUser1, newPass1, session['username']))
             conn.commit()
             session['username'] = newUser1
             return redirect('/settings/updated')
@@ -254,7 +252,7 @@ def settings():
             if len(all_users) > 0:
                 return redirect('/settings')
 
-            cursor.execute('UPDATE users SET username = %s WHERE pass = %s', (newUser1, currentPass))
+            cursor.execute('UPDATE users SET username = %s WHERE username = %s', (newUser1, session['username']))
             conn.commit()
             session['username'] = newUser1
             return redirect('/settings/updated')
@@ -262,21 +260,69 @@ def settings():
         if newPass1 and newPass2:
             if not newPass1 == newPass2:
                 return redirect('/settings')
-            cursor.execute('UPDATE users SET pass = %s WHERE pass = %s', (newPass1, currentPass))
+            cursor.execute('UPDATE users SET pass = %s WHERE username = %s', (newPass1, session['username']))
             conn.commit()
             return redirect('/settings/updated')
 
         cursor.close()
         conn.close()
-
-        print(pass_db)
     
     return render_template("index.html")
 
-@app.route("/settings/updated")
+@app.route("/settings/updated", methods = ('GET', 'POST'))
 def settings_updated():
     if session['username'] == "":
         return redirect('/')
+
+    if request.method == "POST":
+        currentPass = request.form['currentPass']
+        newUser1 = request.form['newUser1']
+        newUser2 = request.form['newUser2']
+        newPass1 = request.form['newPass1']
+        newPass2 = request.form['newPass2']
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT pass FROM users WHERE username = %s', (session['username'],))
+        pass_db = cursor.fetchall()[0][0]
+
+        if not pass_db == currentPass:
+            return redirect('/settings')
+
+        if newUser1 and newUser2 and newPass1 and newPass2:
+            if not newUser1 == newUser2:
+                return redirect('/settings')
+            elif not newPass1 == newPass2:
+                return redirect('/settings')
+            cursor.execute('UPDATE users SET username = %s, pass = %s WHERE username = %s', (newUser1, newPass1, session['username']))
+            conn.commit()
+            session['username'] = newUser1
+            return redirect('/settings/updated')
+        
+        if newUser1 and newUser2:
+            if not newUser1 == newUser2:
+                return redirect('/settings')
+            
+            cursor.execute('SELECT * FROM users WHERE username = %s', (newUser1,))
+            all_users = cursor.fetchall()
+            if len(all_users) > 0:
+                return redirect('/settings')
+
+            cursor.execute('UPDATE users SET username = %s WHERE username = %s', (newUser1, session['username']))
+            conn.commit()
+            session['username'] = newUser1
+            return redirect('/settings/updated')
+
+        if newPass1 and newPass2:
+            if not newPass1 == newPass2:
+                return redirect('/settings')
+            cursor.execute('UPDATE users SET pass = %s WHERE username = %s', (newPass1, session['username']))
+            conn.commit()
+            return redirect('/settings/updated')
+
+        cursor.close()
+        conn.close()
 
     return render_template("index.html")
 
