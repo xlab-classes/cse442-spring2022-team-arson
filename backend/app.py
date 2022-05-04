@@ -104,7 +104,6 @@ def home_upload():
     if local_user == "":
         return redirect('/')
 
-
     if request.method == "POST":
         privacy = request.form['privacy']
         image = request.files['img']
@@ -116,7 +115,6 @@ def home_upload():
             return redirect('/mosaicify/' + privacy + '/' + image.filename)
             
     return render_template("index.html")
-
 
 @app.route("/home/keyword", methods = ('GET', 'POST'))
 def home_keyword():
@@ -259,11 +257,13 @@ def settings():
 
         print(pass_db)
 
+    return render_template("index.html")
+
 
 # @app.route("/settings")
 # def settings():
 #     return render_template("index.html")
-
+    
 @app.route("/settings/updated")
 def settings_updated():
     if local_user == "":
@@ -321,8 +321,7 @@ def results(privacy, user_image):
         newID = cursor.execute('SELECT MAX(imageID) FROM images').fetchall()[0][0] + 1
 
         cursor.execute('INSERT INTO images (username, imageID, setting, imageName) VALUES (?, ?, ?, ?)', (local_user, newID, privacy, user_image))
-        cursor.execute('INSERT INTO images (username, imageID, setting, imageName) VALUES (?, ?, ?, ?)', (session['username'], newID, privacy, user_image))
-        
+
         conn.commit()
 
         images = cursor.execute('SELECT * FROM images').fetchall()
