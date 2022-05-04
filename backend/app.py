@@ -10,8 +10,6 @@ import datetime
 from flask import (Flask, render_template, request, redirect, send_from_directory, session)
 from werkzeug.utils import secure_filename
 
-local_user = ""
-
 app = Flask(__name__)
 
 folder_path = 'static/images/'
@@ -27,8 +25,8 @@ def get_db_connection():
 
 @app.route("/")
 def index():
-    global local_user
-    local_user = ""
+    if session['username']:
+        return redirect('/home')
     return render_template("index.html")
 
 @app.route("/login", methods = ('GET', 'POST'))
@@ -46,9 +44,6 @@ def login():
         conn.close()
 
         if (len(all_users) > 0):
-            global local_user
-            local_user = username
-
             session['username'] = username
 
             return redirect('/home')
@@ -81,54 +76,51 @@ def signup():
 
 @app.route("/home", methods = ('GET', 'POST'))
 def home():
-    if local_user == "":
+    if session['username'] == "":
         return redirect('/')
 
     if request.method == "POST":
         privacy = request.form['privacy']
         image = request.files['img']
-
-        if image:
+        
+        if image and privacy:
             image.save(os.path.join('static', image.filename))
-
-        if privacy:
             return redirect('/mosaicify/' + privacy + '/' + image.filename)
             
     return render_template("index.html")
 
 @app.route("/home/upload", methods = ('GET', 'POST'))
 def home_upload():
-    if local_user == "":
+    if session['username'] == "":
         return redirect('/')
 
     if request.method == "POST":
         privacy = request.form['privacy']
         image = request.files['img']
-
-        if image:
+        
+        if image and privacy:
             image.save(os.path.join('static', image.filename))
-
-        if privacy:
             return redirect('/mosaicify/' + privacy + '/' + image.filename)
             
     return render_template("index.html")
 
 @app.route("/home/keyword", methods = ('GET', 'POST'))
 def home_keyword():
-    if local_user == "":
+    if session['username'] == "":
         return redirect('/')
 
     if request.method == "POST":
+        keyword = request.form['keyword']
         privacy = request.form['privacy']
 
-        if privacy:
-            return redirect('/results/' + privacy + '/test.png')
+        if keyword and privacy:
+            print (keyword)
             
     return render_template("index.html")
 
 @app.route("/home/random", methods = ('GET', 'POST'))
 def home_random():
-    if local_user == "":
+    if session['username'] == "":
         return redirect('/')
 
     if request.method == "POST":
@@ -136,11 +128,31 @@ def home_random():
 
         print ("image status: " + privacy)
 
-        return redirect('/results')
     return render_template("index.html")
 
-@app.route("/profile/")
-def profile():
+@app.route("/myprofile")
+def profile_redirect():
+    if session['username'] == "":
+        return redirect('/')
+
+    return redirect('/profile/' + session['username'])
+
+@app.route("/profile/<user>")
+def profile(user):
+    if not session['username']:
+        return redirect('/')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    poss_users = cursor.execute('SELECT * FROM users WHERE username = ?', (user,)).fetchall()
+
+    cursor.close()
+    conn.close()
+
+    if len(poss_users) == 0:
+        return redirect('/home')
+
     return render_template("index.html")
 
 @app.route("/profile/images")
@@ -192,7 +204,7 @@ def profileimages():
 
 @app.route("/settings", methods = ('GET', 'POST'))
 def settings():
-    if local_user == "":
+    if session['username'] == "":
         return redirect('/')
 
     if request.method == "POST":
@@ -205,7 +217,7 @@ def settings():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        pass_db = cursor.execute('SELECT pass FROM users WHERE username = ?', (local_user,)).fetchall()[0][0]
+        pass_db = cursor.execute('SELECT pass FROM users WHERE username = ?', (session['username'],)).fetchall()[0][0]
 
         if not pass_db == currentPass:
             return redirect('/settings')
@@ -217,6 +229,7 @@ def settings():
                 return redirect('/settings')
             cursor.execute('UPDATE users SET username = ?, pass = ? WHERE pass = ?', (newUser1, newPass1, currentPass))
             conn.commit()
+            session['username'] = newUser1
             return redirect('/settings/updated')
         
         if newUser1 and newUser2:
@@ -229,6 +242,7 @@ def settings():
 
             cursor.execute('UPDATE users SET username = ? WHERE pass = ?', (newUser1, currentPass))
             conn.commit()
+            session['username'] = newUser1
             return redirect('/settings/updated')
 
         if newPass1 and newPass2:
@@ -242,22 +256,19 @@ def settings():
         conn.close()
 
         print(pass_db)
-
-
-@app.route("/settings")
-def settings():
+    
     return render_template("index.html")
 
 @app.route("/settings/updated")
 def settings_updated():
-    if local_user == "":
+    if session['username'] == "":
         return redirect('/')
 
     return render_template("index.html")
 
 @app.route("/mosaicify/<privacy>/<user_image>")
 def mosaicify(privacy, user_image):
-    if local_user == "":
+    if session['username'] == "":
         return redirect('/')
 
     filename = user_image
@@ -277,7 +288,8 @@ def mosaicify(privacy, user_image):
     largest_image = max(input_images, key=lambda x: x.size[0] * x.size[1])
 
     for img in input_images:
-        img.resize((target_image.size[0] // resolution[0], target_image.size[1] // resolution[1]), Image.LANCZOS)
+    # img.resize((target_image.size[0] // resolution[0], target_image.size[1] // resolution[1]), Image.LANCZOS)
+        img.thumbnail((target_image.size[0] // resolution[0], target_image.size[1] // resolution[1]), Image.LANCZOS)
 
     output_mosaic = CreateMosaic(target_image, input_images, resolution)
     print('Mosaic Complete!')
@@ -285,12 +297,14 @@ def mosaicify(privacy, user_image):
     img_name = user_image.split('.')
     new_img = img_name[0] + '_out.' + img_name[1]
     link = os.path.join('static', new_img)
+
+    output_mosaic.thumbnail((   (target_image.size[0] * 5),  (target_image.size[1] * 5)), Image.LANCZOS)
     output_mosaic.save(link)
     return redirect('/results/' + privacy + "/" + new_img)
 
 @app.route("/results/<privacy>/<user_image>", methods = ('GET', 'POST'))
 def results(privacy, user_image):
-    if local_user == "":
+    if session['username'] == "":
         return redirect('/')
 
     if request.method == "POST":
@@ -300,13 +314,9 @@ def results(privacy, user_image):
 
         newID = cursor.execute('SELECT MAX(imageID) FROM images').fetchall()[0][0] + 1
 
-        cursor.execute('INSERT INTO images (username, imageID, setting, imageName) VALUES (?, ?, ?, ?)', (local_user, newID, privacy, user_image))
         cursor.execute('INSERT INTO images (username, imageID, setting, imageName) VALUES (?, ?, ?, ?)', (session['username'], newID, privacy, user_image))
         
         conn.commit()
-
-        images = cursor.execute('SELECT * FROM images').fetchall()
-
         cursor.close()
         conn.close()
 
@@ -316,14 +326,14 @@ def results(privacy, user_image):
 
 @app.route('/image/<path:filename>') 
 def send_file(filename):
-    if local_user == "":
+    if session['username'] == "":
         return redirect('/')
 
     return send_from_directory('static', filename)
 
 @app.route('/id/<int:imageID>') 
 def send_file2(imageID):
-    if local_user == "":
+    if session['username'] == "":
         return redirect('/')
 
     conn = get_db_connection()
@@ -341,7 +351,7 @@ def send_file2(imageID):
 
 @app.route("/view/id/<privacy>/<int:image_id>", methods = ('GET', 'POST'))
 def view(privacy, image_id):
-    if local_user == "":
+    if session['username'] == "":
         return redirect('/')
 
     if request.method == "POST":
@@ -352,7 +362,7 @@ def view(privacy, image_id):
 
         image_info = cursor.execute('SELECT * FROM images WHERE imageID = ?', (image_id,)).fetchall()
 
-        if not image_info[0][0] == local_user:
+        if not image_info[0][0] == session['username']:
             return redirect('/view/id/' + privacy + '/' + str(image_id))
 
         cursor.execute('UPDATE images SET setting = ? WHERE imageID = ?', (new_privacy, image_id))
@@ -371,10 +381,15 @@ def view(privacy, image_id):
     cursor.close()
     conn.close()
 
-    if ((not image_info[0][0] == local_user) and (image_info[0][2] == "private")):
+    if ((not image_info[0][0] == session['username']) and (image_info[0][2] == "private")):
         return redirect('/home')
 
     return render_template('index.html')
+
+@app.route("/logout")
+def logout():
+    session['username'] = ""
+    return redirect('/')
 
 #======================================================================================================
 

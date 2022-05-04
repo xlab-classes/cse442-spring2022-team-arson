@@ -24,7 +24,7 @@ class HomeRandom extends React.Component {
             <div className={home.home}>
                 <header className={home.header}>
                     <Rectangles2/>
-                    <div className={home.logo}> <img src={logo} alt="logo"/></div>
+                    <img className={home.logo} src={logo} alt="logo"/> 
                     <div className={home.titleBG}></div>
                     <text className = {home.BannerText}>Mosaic Maker</text>
                     <div className = {home.Border}></div>
@@ -58,7 +58,7 @@ class HomeRandom extends React.Component {
                         <form className={home.selections} onChange={this.onChangeValue} method = "post">
                             <input type="radio" name="privacy" value="public" className={home.public} checked = "checked"/><text className={home.publictext}>Public</text>
                             <input type="radio" name="privacy" value="private" className={home.private}/> <text className={home.privatetext}>Private</text>
-                            <button className={home.submit} type = "submit" disabled>
+                            <button className={home.submit} type = "submit">
                               <text className={home.submittext}>SUBMIT</text>
                             </button>
                         </form>

@@ -3,6 +3,24 @@ import './profile.css'
 import Logo_Img from './Mosaic Maker.png';
 import Rectangles2 from './rectangles2';
 import Menu from '../Component/Menu.js';
+import { useParams } from 'react-router-dom';
+
+const RenderProfile = () => {
+    const {user} = useParams();
+
+    return (
+        <>
+        <Rectangles2 />
+        <img className = "Logo2" src = {Logo_Img} alt = ""></img>
+        <div className = "Banner"></div>
+        <text className = "BannerText">Mosaic Maker</text>
+        <div className = "Border"></div>
+
+        <div className = "profileBar"></div>
+        <text className = "profileText">{user}'s Profile</text>
+        </>
+    );
+}
 
 class Profile extends React.Component {
     constructor(props){
@@ -101,15 +119,7 @@ class Profile extends React.Component {
     render () {
         return (
             <>
-            <Rectangles2 />
-            <img className = "Logo2" src = {Logo_Img} alt = ""></img>
-            <div className = "Banner"></div>
-            <text className = "BannerText">Mosaic Maker</text>
-            <div className = "Border"></div>
-
-            <div className = "profileBar"></div>
-            <text className = "profileText">username's Profile</text>
-
+            <RenderProfile />
             <text className = "filterLabel">FILTER:</text>
             <div className = "filterMenu"></div>
             <div className = "filterChoice" onClick={this.handleDropDown}>
@@ -144,7 +154,7 @@ class Profile extends React.Component {
                 {/* Form Subbmision to /home/upload saves images redirects to moscaicify */}
                 {/* Image sizes are severly effecting perf */}
                 {/* {this.state.results.map((image) => <div> image.imageID </div>)} */}
-                {this.state.results.map((image) => <div> <img src={`/id/${image.imageID}`}></img> </div> )}
+                {this.state.results.map((image) => <div className= "image"> <img src={`/id/${image.imageID}`} alt={`${image.imageID}`} className="images"/> </div> )}
             </div>
 
             { this.state.results.length == this.state.filtered.length
