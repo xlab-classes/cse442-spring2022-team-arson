@@ -24,7 +24,7 @@ class HomeKeyword extends React.Component {
             <div className={home.home}>
                 <header className={home.header}>
                     <Rectangles2/>
-                    <div className={home.logo}> <img src={logo} alt="logo"/></div>
+                    <img className={home.logo} src={logo} alt="logo"/> 
                     <div className={home.titleBG}></div>
                     <text className = {home.BannerText}>Mosaic Maker</text>
                     <div className = {home.Border}></div>
@@ -48,26 +48,26 @@ class HomeKeyword extends React.Component {
                     </Link>
                   </div>
                   <div className={home.background}>
-                    <div className={home.keywordfield}>
+                    <form className={home.keywordfield} enctype="multipart/form-data" method = "post">
+                      <div className={home.selections}>
+                        <text className={home.keywordbigtext}>
+                          Enter a word below:
+                        </text>
+                      </div>
                         <div className={home.selections}>
-                            <text className={home.keywordbigtext}>
-                                Enter a word below:
-                            </text>
+                          <input type="text" name = "keyword" className={home.keywordinput}></input>
                         </div>
                         <div className={home.selections}>
-                            <input type="text" className={home.keywordinput}></input>
+                          <text className={home.description}>Examples: cat, sunflower, etc.</text>
                         </div>
-                        <div className={home.selections}>
-                            <text className={home.description}>Examples: cat, sunflower, etc.</text>
+                        <div className={home.selections} onChange={this.onChangeValue}>
+                          <input type="radio" name="privacy" value="public" className={home.public} checked = "checked"/><text className={home.publictext}>Public</text>
+                          <input type="radio" name="privacy" value="private" className={home.private}/> <text className={home.privatetext}>Private</text>
+                          <button className={home.submit} type = "submit">
+                            <text className={home.submittext}>SUBMIT</text>
+                          </button>
                         </div>
-                        <form className={home.selections} onChange={this.onChangeValue} method = "post">
-                            <input type="radio" name="privacy" value="public" className={home.public} checked = "checked"/><text className={home.publictext}>Public</text>
-                            <input type="radio" name="privacy" value="private" className={home.private}/> <text className={home.privatetext}>Private</text>
-                            <button className={home.submit} type = "submit" disabled>
-                              <text className={home.submittext}>SUBMIT</text>
-                            </button>
-                        </form>
-                    </div>
+                      </form>
                   </div>
                 </div>
                 <div className={home.Border2}></div>

@@ -8,6 +8,8 @@ cursor.execute("CREATE TABLE IF NOT EXISTS users (username VARCHAR(255), pass VA
 
 cursor.execute("CREATE TABLE IF NOT EXISTS images (username VARCHAR(255), imageID INT, setting VARCHAR(255), imageName VARCHAR(255))")
 
+cursor.execute("CREATE TABLE IF NOT EXISTS meta (dataname VARCHAR(255), data VARCHAR(255), imageID INT)")
+
 cursor.execute('INSERT INTO images (username, imageID, setting, imageName) VALUES ("admin", 100, "private", "trew.png")')
 
 connection.commit()

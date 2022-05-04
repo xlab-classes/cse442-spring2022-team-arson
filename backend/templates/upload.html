@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>image mosiac</title>
+</head>
+<body>
+    <a href="/home">home</a>
+    <a href="/profile">profile</a>
+    <a href="/logout">logout</a>
+    {% if msg %}
+        <h1>{{ msg }}</h1>
+    {% endif %}
+    <form enctype="multipart/form-data" action="/home" method="post">
+        <input type="file" name="file">
+        <input type="submit" value="Submit">
+    </form>
+    {% if img %}
+        <img src="/uploads/{{ img }}" alt="" srcset="">
+        <br>
+        <a href="/mosiac/{{ img }}">mosiac</a>
+    {% endif %}
+</body>
+</html>
