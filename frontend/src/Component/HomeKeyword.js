@@ -24,7 +24,7 @@ class HomeKeyword extends React.Component {
             <div className={home.home}>
                 <header className={home.header}>
                     <Rectangles2/>
-                    <div className={home.logo}> <img src={logo} alt="logo"/></div>
+                    <img className={home.logo} src={logo} alt="logo"/> 
                     <div className={home.titleBG}></div>
                     <text className = {home.BannerText}>Mosaic Maker</text>
                     <div className = {home.Border}></div>

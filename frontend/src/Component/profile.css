@@ -280,8 +280,8 @@ img {
 
 /* Dropdown CSS Stuff May change to javascript */
 
-images {
-    height: 257px;
-    width: 231px;
+.images {
+    height: 258px;
+    width: 270px;
     display: inline-block;
 }
