@@ -13,7 +13,7 @@ const Results = () => {
             <div className={results.results}>
                 <header className={results.header}>
                     <Rectangles2/>
-                    <div className={results.logo}> <img src={logo} alt="logo"/></div>
+                    <img className={results.logo} src={logo} alt="logo"/>
                     <div className={results.titleBG}></div>
                     <text className = {results.BannerText}>Mosaic Maker</text>
                     <div className = {results.Border}></div>
