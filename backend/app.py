@@ -1,6 +1,5 @@
 import imghdr
 import json
-import sqlite3
 import os
 import PIL
 from PIL import Image
@@ -10,6 +9,7 @@ import datetime
 from flask import (Flask, render_template, request, redirect, send_from_directory, session)
 from werkzeug.utils import secure_filename
 from flask_mysql_connector import MySQL
+from datetime import date
 
 app = Flask(__name__)
 
@@ -160,11 +160,11 @@ def profile(user):
     if len(poss_users) == 0:
         return redirect('/home')
 
-    return render_template("index.html")
+    return render_template("index.html", profile_user = user)
 
-@app.route("/profile/images")
-def profileimages():
-    print('Profile Stuff')
+@app.route("/profile/images/<user>")
+def profileimages(user):
+    # print('Profile Stuff')
     # Return the users profile 
     # session['username'] = '123'
     # username = session['username']
@@ -173,9 +173,9 @@ def profileimages():
     cursor = conn.cursor()
 
     # Grab from new table here
-    cursor.execute('SELECT * FROM images WHERE username = %s', (session['username'],))
+    cursor.execute('SELECT * FROM images WHERE username = %s', (user,))
     userimages = cursor.fetchall()
-    print(userimages)
+    # print(userimages)
 
     # Create metadata if not any
     for images in userimages:
@@ -375,13 +375,15 @@ def results(privacy, user_image):
         cursor.execute('SELECT MAX(imageID) FROM images')
         newID = cursor.fetchall()[0][0] + 1
 
-        cursor.execute('INSERT INTO images (username, imageID, setting, imageName) VALUES (%s, %s, %s, %s)', (session['username'], newID, privacy, user_image))
+        curr_date = date.today()
+
+        cursor.execute('INSERT INTO images (username, imageID, setting, imageName, date) VALUES (%s, %s, %s, %s, %s)', (session['username'], newID, privacy, user_image, curr_date))
         
         conn.commit()
         cursor.close()
         conn.close()
 
-        return redirect('/view/id/' + privacy + '/' + str(newID))
+        return redirect('/view/id/' + str(newID))
     
     return render_template('index.html')
 
@@ -411,22 +413,26 @@ def send_file2(imageID):
     # imgpath.resize((600,600),Image.ANTIALIAS).save(f"./static/small_{image_info[0][3]}")
     return send_from_directory('static', image_info[0][3])
 
-@app.route("/view/id/<privacy>/<int:image_id>", methods = ('GET', 'POST'))
-def view(privacy, image_id):
+@app.route("/view/id/<int:image_id>", methods = ('GET', 'POST'))
+def view(image_id):
     if session['username'] == "":
         return redirect('/')
 
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT * FROM images WHERE imageID = %s', (image_id,))
+    image_info = cursor.fetchall()
+    privacy = image_info[0][2]
+
     if request.method == "POST":
         new_privacy = request.form["privacy"]
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
 
         cursor.execute('SELECT * FROM images WHERE imageID = %s', (image_id,))
         image_info = cursor.fetchall()
 
         if not image_info[0][0] == session['username']:
-            return redirect('/view/id/' + privacy + '/' + str(image_id))
+            return redirect('/view/id/' + str(image_id))
 
         cursor.execute('UPDATE images SET setting = %s WHERE imageID = %s', (new_privacy, image_id))
         conn.commit()
@@ -434,21 +440,17 @@ def view(privacy, image_id):
         cursor.close()
         conn.close()
 
-        return redirect('/view/id/' + new_privacy + '/' + str(image_id))
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute('SELECT * FROM images WHERE imageID = %s', (image_id,))
-    image_info = cursor.fetchall()
+        return redirect('/view/id/' + str(image_id))
 
     cursor.close()
     conn.close()
 
-    if ((not image_info[0][0] == session['username']) and (image_info[0][2] == "private")):
+    if ((not image_info[0][0] == session['username']) and (privacy == "private")):
         return redirect('/home')
 
-    return render_template('index.html')
+    curr_date = image_info[0][4].strftime("%m/%d/%Y")
+
+    return render_template('index.html', view_privacy = privacy, image_owner = image_info[0][0], view_date = curr_date)
 
 @app.route("/logout")
 def logout():
