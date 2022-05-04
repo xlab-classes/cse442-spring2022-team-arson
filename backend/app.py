@@ -9,7 +9,9 @@ import urllib.request
 import datetime
 from flask import (Flask, render_template, request, redirect, send_from_directory, session)
 from werkzeug.utils import secure_filename
-
+from icrawler.builtin import GoogleImageCrawler
+from icrawler import ImageDownloader
+from random_word import RandomWords
 local_user = ""
 
 app = Flask(__name__)
@@ -98,6 +100,7 @@ def home():
 
 @app.route("/home/upload", methods = ('GET', 'POST'))
 def home_upload():
+
     if local_user == "":
         return redirect('/')
 
@@ -121,10 +124,15 @@ def home_keyword():
     if request.method == "POST":
         privacy = request.form['privacy']
 
+        key_word = "porkchop"
+        # key_word = request.form['text']
+        image = RandomImageScrape(key_word)
+
         if privacy:
-            return redirect('/results/' + privacy + '/test.png')
-            
+            return redirect('/mosaicify/' + privacy + '/' + image)
+             
     return render_template("index.html")
+
 
 @app.route("/home/random", methods = ('GET', 'POST'))
 def home_random():
@@ -133,7 +141,13 @@ def home_random():
 
     if request.method == "POST":
         privacy = request.form['privacy']
+        
+        # no key_word default to random keyword being generated
+        image = RandomImageScrape()
 
+        if privacy:
+            return redirect('/mosaicify/' + privacy + '/' + image)
+           
         print ("image status: " + privacy)
 
         return redirect('/results')
@@ -242,9 +256,14 @@ def settings():
         conn.close()
 
         print(pass_db)
-    
+
     return render_template("index.html")
 
+
+# @app.route("/settings")
+# def settings():
+#     return render_template("index.html")
+    
 @app.route("/settings/updated")
 def settings_updated():
     if local_user == "":
@@ -254,6 +273,7 @@ def settings_updated():
 
 @app.route("/mosaicify/<privacy>/<user_image>")
 def mosaicify(privacy, user_image):
+
     if local_user == "":
         return redirect('/')
 
@@ -274,7 +294,8 @@ def mosaicify(privacy, user_image):
     largest_image = max(input_images, key=lambda x: x.size[0] * x.size[1])
 
     for img in input_images:
-        img.resize((target_image.size[0] // resolution[0], target_image.size[1] // resolution[1]), Image.LANCZOS)
+        # img = img.resize((target_image.size[0] // resolution[0], target_image.size[1] // resolution[1]), Image.LANCZOS)
+        img.thumbnail((target_image.size[0] // resolution[0], target_image.size[1] // resolution[1]), Image.LANCZOS)
 
     output_mosaic = CreateMosaic(target_image, input_images, resolution)
     print('Mosaic Complete!')
@@ -282,6 +303,8 @@ def mosaicify(privacy, user_image):
     img_name = user_image.split('.')
     new_img = img_name[0] + '_out.' + img_name[1]
     link = os.path.join('static', new_img)
+
+    output_mosaic.thumbnail((   (target_image.size[0] * 5),  (target_image.size[1] * 5)), Image.LANCZOS)
     output_mosaic.save(link)
     return redirect('/results/' + privacy + "/" + new_img)
 
@@ -473,3 +496,38 @@ def CreateMosaic(target_image, input_images, resolution):
         MOSAIC.paste(output_images[i], (col * width, row * height))
 
     return MOSAIC
+
+#======================================================================================================
+
+class RandomDownloader(ImageDownloader):
+
+    def get_filename(self, task, default_ext):
+        filename = super(RandomDownloader, self).get_filename(
+            task, default_ext)
+        global key
+        filename = key + ".jpg"
+        return filename
+
+
+def RandomImageScrape(key_word=None):
+    google_crawler = GoogleImageCrawler(
+        downloader_cls=RandomDownloader,
+        storage={'root_dir': 'static'})
+
+    if not key_word:
+        r = RandomWords()
+        global key
+        key = r.get_random_word(
+            hasDictionaryDef="true",
+            includePartOfSpeech="noun, adverb",
+            minCorpusCount=1,
+            maxCorpusCount=100)
+        google_crawler.crawl(keyword=key, max_num=1) 
+        image = key + ".jpg"
+    else:
+        key = key_word
+        google_crawler.crawl(keyword=key, max_num=1) 
+
+        image = key + ".jpg"
+
+    return image
