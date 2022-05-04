@@ -9,7 +9,7 @@ import urllib.request
 import datetime
 from flask import (Flask, render_template, request, redirect, send_from_directory, session)
 from werkzeug.utils import secure_filename
-from flask_mysqldb import MySQL
+from flask_mysql_connector import MySQL
 
 app = Flask(__name__)
 
@@ -22,10 +22,11 @@ PIL.Image.MAX_IMAGE_PIXELS = 999999999
 app.config['MYSQL_HOST'] = 'oceanus.cse.buffalo.edu'
 app.config['MYSQL_USER'] = 'jhhou'
 app.config['MYSQL_PASSWORD'] = '50292168'
-app.config['MYSQL_DB'] = 'cse442_2022_spring_team_u_db'
+app.config['MYSQL_DATABASE'] = 'cse442_2022_spring_team_u_db'
+mysql = MySQL(app)
 
 def get_db_connection():
-    conn = sqlite3.connect('../database/database.db')
+    conn = mysql.connection
     return conn
 
 @app.route("/")
