@@ -375,10 +375,10 @@
 }
 
 .submit {
-  position: relative;
+  position: absolute;
   width: 173.51px;
   height: 52.5px;
-  top: 26px;
+  margin-top: 26px;
   cursor: pointer;
 
   background: #D9CFB7;

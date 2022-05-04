@@ -26,7 +26,7 @@ class MenuShow extends React.Component {
             </div>
           </a>
           {/*Link to landing page*/}
-          <a href = '/'>
+          <a href = '/logout'>
             <div className={menu2.Rectangle4}>
               <text className={menu2.Logout}>LOG OUT</text>
             </div>
