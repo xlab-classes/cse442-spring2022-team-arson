@@ -8,6 +8,9 @@ import urllib.request
 import datetime
 from flask import (Flask, render_template, request, redirect, send_from_directory, session)
 from werkzeug.utils import secure_filename
+from icrawler.builtin import GoogleImageCrawler
+from icrawler import ImageDownloader
+from random_word import RandomWords
 from flask_mysql_connector import MySQL
 from datetime import date
 
@@ -97,6 +100,7 @@ def home():
 
 @app.route("/home/upload", methods = ('GET', 'POST'))
 def home_upload():
+
     if session['username'] == "":
         return redirect('/')
 
@@ -120,7 +124,9 @@ def home_keyword():
         privacy = request.form['privacy']
 
         if keyword and privacy:
-            print (keyword)
+            print(keyword)
+            image = RandomImageScrape(keyword)
+            return redirect('/mosaicify/' + privacy + '/' + image)
             
     return render_template("index.html")
 
@@ -131,8 +137,14 @@ def home_random():
 
     if request.method == "POST":
         privacy = request.form['privacy']
+        
+        # no keyword default to random keyword being generated
+        image = RandomImageScrape()
 
-        print ("image status: " + privacy)
+        if privacy:
+            return redirect('/mosaicify/' + privacy + '/' + image)
+           
+        print("image status: " + privacy)
 
     return render_template("index.html")
 
@@ -211,7 +223,6 @@ def profileimages(user):
 
     return json.dumps(dictionary)
 
-
 @app.route("/settings", methods = ('GET', 'POST'))
 def settings():
     if session['username'] == "":
@@ -266,7 +277,9 @@ def settings():
 
         cursor.close()
         conn.close()
-    
+
+        print(pass_db)
+
     return render_template("index.html")
 
 @app.route("/settings/updated", methods = ('GET', 'POST'))
@@ -328,6 +341,7 @@ def settings_updated():
 
 @app.route("/mosaicify/<privacy>/<user_image>")
 def mosaicify(privacy, user_image):
+
     if session['username'] == "":
         return redirect('/')
 
@@ -348,7 +362,8 @@ def mosaicify(privacy, user_image):
     largest_image = max(input_images, key=lambda x: x.size[0] * x.size[1])
 
     for img in input_images:
-    # img.resize((target_image.size[0] // resolution[0], target_image.size[1] // resolution[1]), Image.LANCZOS)
+        # img = img.resize((target_image.size[0] // resolution[0], target_image.size[1] // resolution[1]), Image.LANCZOS)
+        # img.resize((target_image.size[0] // resolution[0], target_image.size[1] // resolution[1]), Image.LANCZOS)
         img.thumbnail((target_image.size[0] // resolution[0], target_image.size[1] // resolution[1]), Image.LANCZOS)
 
     output_mosaic = CreateMosaic(target_image, input_images, resolution)
@@ -558,3 +573,37 @@ def CreateMosaic(target_image, input_images, resolution):
         MOSAIC.paste(output_images[i], (col * width, row * height))
 
     return MOSAIC
+
+#======================================================================================================
+
+class RandomDownloader(ImageDownloader):
+
+    def get_filename(self, task, default_ext):
+        filename = super(RandomDownloader, self).get_filename(
+            task, default_ext)
+        global key
+        filename = key + ".jpg"
+        return filename
+
+def RandomImageScrape(key_word=None):
+    google_crawler = GoogleImageCrawler(
+        downloader_cls=RandomDownloader,
+        storage={'root_dir': 'static'})
+
+    if not key_word:
+        r = RandomWords()
+        global key
+        key = r.get_random_word(
+            hasDictionaryDef="true",
+            includePartOfSpeech="noun, adverb",
+            minCorpusCount=1,
+            maxCorpusCount=100)
+        google_crawler.crawl(keyword=key, max_num=1) 
+        image = key + ".jpg"
+    else:
+        key = key_word
+        google_crawler.crawl(keyword=key, max_num=1) 
+
+        image = key + ".jpg"
+
+    return image

@@ -14,7 +14,7 @@ class MenuShow extends React.Component {
             </div>
           </a>
           {/*Link to profile*/}
-          <a href = '/myprofile'>
+          <a href = '/profile'>
             <div className={menu2.Rectangle2}>
               <text className={menu2.Profile}>PROFILE</text>
             </div>
