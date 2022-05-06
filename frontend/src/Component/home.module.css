@@ -256,7 +256,7 @@
 .recentimagesBG {
   position: relative;
   width: 1244px;
-  height: 100%;
+  height: fit-content;
   display: flex;
 
   background: #FFFFFF;
