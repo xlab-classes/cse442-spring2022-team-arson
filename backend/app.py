@@ -1,6 +1,5 @@
 import imghdr
 import json
-import sqlite3
 import os
 import PIL
 from PIL import Image
@@ -9,6 +8,11 @@ import urllib.request
 import datetime
 from flask import (Flask, render_template, request, redirect, send_from_directory, session)
 from werkzeug.utils import secure_filename
+from icrawler.builtin import GoogleImageCrawler
+from icrawler import ImageDownloader
+from random_word import RandomWords
+from flask_mysql_connector import MySQL
+from datetime import date
 
 app = Flask(__name__)
 
@@ -18,15 +22,18 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.secret_key = "amongus" # change to urandom later
 PIL.Image.MAX_IMAGE_PIXELS = 999999999
 
+app.config['MYSQL_HOST'] = 'oceanus.cse.buffalo.edu'
+app.config['MYSQL_USER'] = 'jhhou'
+app.config['MYSQL_PASSWORD'] = '50292168'
+app.config['MYSQL_DATABASE'] = 'cse442_2022_spring_team_u_db'
+mysql = MySQL(app)
 
 def get_db_connection():
-    conn = sqlite3.connect('../database/database.db')
+    conn = mysql.connection
     return conn
 
 @app.route("/")
 def index():
-    if session['username']:
-        return redirect('/home')
     return render_template("index.html")
 
 @app.route("/login", methods = ('GET', 'POST'))
@@ -38,7 +45,8 @@ def login():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        all_users = cursor.execute('SELECT * FROM users WHERE username = ? AND pass = ?', (username, passwd)).fetchall()
+        cursor.execute('SELECT * FROM users WHERE username = %s AND pass = %s', (username, passwd))
+        all_users = cursor.fetchall()
 
         cursor.close()
         conn.close()
@@ -59,10 +67,11 @@ def signup():
             conn = get_db_connection()
             cursor = conn.cursor()
 
-            poss_users = cursor.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchall()
+            cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
+            poss_users = cursor.fetchall()            
 
-            if (len(poss_users) == 0):
-                cursor.execute('INSERT INTO users (username, pass) VALUES (?, ?)', (username, passwd))
+            if (len(poss_users)== 0):
+                cursor.execute('INSERT INTO users (username, pass) VALUES (%s, %s)', (username, passwd))
 
                 conn.commit()
                 cursor.close()
@@ -91,6 +100,7 @@ def home():
 
 @app.route("/home/upload", methods = ('GET', 'POST'))
 def home_upload():
+
     if session['username'] == "":
         return redirect('/')
 
@@ -114,7 +124,8 @@ def home_keyword():
         privacy = request.form['privacy']
 
         if keyword and privacy:
-            print (keyword)
+            image = RandomImageScrape(keyword)
+            return redirect('/mosaicify/' + privacy + '/' + image)
             
     return render_template("index.html")
 
@@ -125,10 +136,36 @@ def home_random():
 
     if request.method == "POST":
         privacy = request.form['privacy']
+        
+        # no keyword default to random keyword being generated
+        image = RandomImageScrape()
 
-        print ("image status: " + privacy)
+        if privacy:
+            return redirect('/mosaicify/' + privacy + '/' + image)
+           
+        print("image status: " + privacy)
 
     return render_template("index.html")
+
+@app.route("/home/images")
+def getRecentImages():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT * FROM images WHERE setting = %s ORDER BY imageID DESC', ("public",))
+    allImages = cursor.fetchall()
+    recentImages = allImages[:10]
+
+    home_dictionary = []
+    for image in recentImages:
+        entry = {}
+        entry['imageID'] = image[1]
+        home_dictionary.append(entry)
+
+    cursor.close()
+    conn.close()
+
+    return json.dumps(home_dictionary)
 
 @app.route("/myprofile")
 def profile_redirect():
@@ -145,7 +182,8 @@ def profile(user):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    poss_users = cursor.execute('SELECT * FROM users WHERE username = ?', (user,)).fetchall()
+    cursor.execute('SELECT * FROM users WHERE username = %s', (user,))
+    poss_users = cursor.fetchall()
 
     cursor.close()
     conn.close()
@@ -153,11 +191,11 @@ def profile(user):
     if len(poss_users) == 0:
         return redirect('/home')
 
-    return render_template("index.html")
+    return render_template("index.html", profile_user = user)
 
-@app.route("/profile/images")
-def profileimages():
-    print('Profile Stuff')
+@app.route("/profile/images/<user>")
+def profileimages(user):
+    # print('Profile Stuff')
     # Return the users profile 
     # session['username'] = '123'
     # username = session['username']
@@ -165,15 +203,24 @@ def profileimages():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Grab from new table here
-    userimages = cursor.execute('SELECT * FROM images WHERE username = ?', (session['username'],)).fetchall()
-    print(userimages)
+    if session['username'] == user:
+        # Grab from new table here
+        cursor.execute('SELECT * FROM images WHERE username = %s', (user,))
+        userimages = cursor.fetchall()
+        # print(userimages)
+    
+    else:
+        # Grab from new table here
+        cursor.execute('SELECT * FROM images WHERE username = %s AND setting = %s', (user, "public"))
+        userimages = cursor.fetchall()
+        # print(userimages)
 
     # Create metadata if not any
     for images in userimages:
         imageID = images[1]
         # print(imageID)
-        metadata = cursor.execute('SELECT * FROM meta WHERE imageID = ?',(imageID,)).fetchall()
+        cursor.execute('SELECT * FROM meta WHERE imageID = %s',(imageID,))
+        metadata = cursor.fetchall()
         if not metadata:
             # userimages = cursor.execute('SELECT * FROM images WHERE imageID = ?', (imageID,)).fetchall()
             # print(metadata)
@@ -181,8 +228,8 @@ def profileimages():
             image_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', filename))
             size = os.path.getsize(image_path)
             creation_time = os.path.getctime(image_path)
-            cursor.execute('INSERT INTO meta (dataname, data, imageID) VALUES (?, ?, ?)', ('size',str(size),imageID))
-            cursor.execute('INSERT INTO meta (dataname, data, imageID) VALUES (?, ?, ?)', ('ctime',str(int(creation_time)),imageID)) # Time to epoch
+            cursor.execute('INSERT INTO meta (dataname, data, imageID) VALUES (%s, %s, %s)', ('size',str(size),imageID))
+            cursor.execute('INSERT INTO meta (dataname, data, imageID) VALUES (%s, %s, %s)', ('ctime',str(int(creation_time)),imageID)) # Time to epoch
             conn.commit()
 
     # Retrieve metadata
@@ -190,7 +237,8 @@ def profileimages():
     for images in userimages:
         entry = {}
         entry['imageID'] = images[1]
-        metadata = cursor.execute('SELECT * FROM meta WHERE imageID = ?',(images[1],)).fetchall()
+        cursor.execute('SELECT * FROM meta WHERE imageID = %s',(images[1],))
+        metadata = cursor.fetchall()
         for meta in metadata:
             dataname, data = meta[0],meta[1]
             entry[dataname] = data
@@ -200,7 +248,6 @@ def profileimages():
     conn.close()
 
     return json.dumps(dictionary)
-
 
 @app.route("/settings", methods = ('GET', 'POST'))
 def settings():
@@ -217,7 +264,8 @@ def settings():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        pass_db = cursor.execute('SELECT pass FROM users WHERE username = ?', (session['username'],)).fetchall()[0][0]
+        cursor.execute('SELECT pass FROM users WHERE username = %s', (session['username'],))
+        pass_db = cursor.fetchall()[0][0]
 
         if not pass_db == currentPass:
             return redirect('/settings')
@@ -227,7 +275,7 @@ def settings():
                 return redirect('/settings')
             elif not newPass1 == newPass2:
                 return redirect('/settings')
-            cursor.execute('UPDATE users SET username = ?, pass = ? WHERE pass = ?', (newUser1, newPass1, currentPass))
+            cursor.execute('UPDATE users SET username = %s, pass = %s WHERE username = %s', (newUser1, newPass1, session['username']))
             conn.commit()
             session['username'] = newUser1
             return redirect('/settings/updated')
@@ -236,11 +284,12 @@ def settings():
             if not newUser1 == newUser2:
                 return redirect('/settings')
             
-            all_users = cursor.execute('SELECT * FROM users WHERE username = ?', (newUser1,)).fetchall()
+            cursor.execute('SELECT * FROM users WHERE username = %s', (newUser1,))
+            all_users = cursor.fetchall()
             if len(all_users) > 0:
                 return redirect('/settings')
 
-            cursor.execute('UPDATE users SET username = ? WHERE pass = ?', (newUser1, currentPass))
+            cursor.execute('UPDATE users SET username = %s WHERE username = %s', (newUser1, session['username']))
             conn.commit()
             session['username'] = newUser1
             return redirect('/settings/updated')
@@ -248,7 +297,7 @@ def settings():
         if newPass1 and newPass2:
             if not newPass1 == newPass2:
                 return redirect('/settings')
-            cursor.execute('UPDATE users SET pass = ? WHERE pass = ?', (newPass1, currentPass))
+            cursor.execute('UPDATE users SET pass = %s WHERE username = %s', (newPass1, session['username']))
             conn.commit()
             return redirect('/settings/updated')
 
@@ -256,18 +305,69 @@ def settings():
         conn.close()
 
         print(pass_db)
-    
+
     return render_template("index.html")
 
-@app.route("/settings/updated")
+@app.route("/settings/updated", methods = ('GET', 'POST'))
 def settings_updated():
     if session['username'] == "":
         return redirect('/')
+
+    if request.method == "POST":
+        currentPass = request.form['currentPass']
+        newUser1 = request.form['newUser1']
+        newUser2 = request.form['newUser2']
+        newPass1 = request.form['newPass1']
+        newPass2 = request.form['newPass2']
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT pass FROM users WHERE username = %s', (session['username'],))
+        pass_db = cursor.fetchall()[0][0]
+
+        if not pass_db == currentPass:
+            return redirect('/settings')
+
+        if newUser1 and newUser2 and newPass1 and newPass2:
+            if not newUser1 == newUser2:
+                return redirect('/settings')
+            elif not newPass1 == newPass2:
+                return redirect('/settings')
+            cursor.execute('UPDATE users SET username = %s, pass = %s WHERE username = %s', (newUser1, newPass1, session['username']))
+            conn.commit()
+            session['username'] = newUser1
+            return redirect('/settings/updated')
+        
+        if newUser1 and newUser2:
+            if not newUser1 == newUser2:
+                return redirect('/settings')
+            
+            cursor.execute('SELECT * FROM users WHERE username = %s', (newUser1,))
+            all_users = cursor.fetchall()
+            if len(all_users) > 0:
+                return redirect('/settings')
+
+            cursor.execute('UPDATE users SET username = %s WHERE username = %s', (newUser1, session['username']))
+            conn.commit()
+            session['username'] = newUser1
+            return redirect('/settings/updated')
+
+        if newPass1 and newPass2:
+            if not newPass1 == newPass2:
+                return redirect('/settings')
+            cursor.execute('UPDATE users SET pass = %s WHERE username = %s', (newPass1, session['username']))
+            conn.commit()
+            return redirect('/settings/updated')
+
+        cursor.close()
+        conn.close()
 
     return render_template("index.html")
 
 @app.route("/mosaicify/<privacy>/<user_image>")
 def mosaicify(privacy, user_image):
+
     if session['username'] == "":
         return redirect('/')
 
@@ -288,7 +388,8 @@ def mosaicify(privacy, user_image):
     largest_image = max(input_images, key=lambda x: x.size[0] * x.size[1])
 
     for img in input_images:
-    # img.resize((target_image.size[0] // resolution[0], target_image.size[1] // resolution[1]), Image.LANCZOS)
+        # img = img.resize((target_image.size[0] // resolution[0], target_image.size[1] // resolution[1]), Image.LANCZOS)
+        # img.resize((target_image.size[0] // resolution[0], target_image.size[1] // resolution[1]), Image.LANCZOS)
         img.thumbnail((target_image.size[0] // resolution[0], target_image.size[1] // resolution[1]), Image.LANCZOS)
 
     output_mosaic = CreateMosaic(target_image, input_images, resolution)
@@ -312,15 +413,18 @@ def results(privacy, user_image):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        newID = cursor.execute('SELECT MAX(imageID) FROM images').fetchall()[0][0] + 1
+        cursor.execute('SELECT MAX(imageID) FROM images')
+        newID = cursor.fetchall()[0][0] + 1
 
-        cursor.execute('INSERT INTO images (username, imageID, setting, imageName) VALUES (?, ?, ?, ?)', (session['username'], newID, privacy, user_image))
+        curr_date = date.today()
+
+        cursor.execute('INSERT INTO images (username, imageID, setting, imageName, date) VALUES (%s, %s, %s, %s, %s)', (session['username'], newID, privacy, user_image, curr_date))
         
         conn.commit()
         cursor.close()
         conn.close()
 
-        return redirect('/view/id/' + privacy + '/' + str(newID))
+        return redirect('/view/id/' + str(newID))
     
     return render_template('index.html')
 
@@ -339,7 +443,8 @@ def send_file2(imageID):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    image_info = cursor.execute('SELECT * FROM images WHERE imageID = ?', (imageID,)).fetchall()
+    cursor.execute('SELECT * FROM images WHERE imageID = %s', (imageID,))
+    image_info = cursor.fetchall()
 
     cursor.close()
     conn.close()
@@ -349,42 +454,44 @@ def send_file2(imageID):
     # imgpath.resize((600,600),Image.ANTIALIAS).save(f"./static/small_{image_info[0][3]}")
     return send_from_directory('static', image_info[0][3])
 
-@app.route("/view/id/<privacy>/<int:image_id>", methods = ('GET', 'POST'))
-def view(privacy, image_id):
+@app.route("/view/id/<int:image_id>", methods = ('GET', 'POST'))
+def view(image_id):
     if session['username'] == "":
         return redirect('/')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT * FROM images WHERE imageID = %s', (image_id,))
+    image_info = cursor.fetchall()
+    privacy = image_info[0][2]
 
     if request.method == "POST":
         new_privacy = request.form["privacy"]
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        image_info = cursor.execute('SELECT * FROM images WHERE imageID = ?', (image_id,)).fetchall()
+        cursor.execute('SELECT * FROM images WHERE imageID = %s', (image_id,))
+        image_info = cursor.fetchall()
 
         if not image_info[0][0] == session['username']:
-            return redirect('/view/id/' + privacy + '/' + str(image_id))
+            return redirect('/view/id/' + str(image_id))
 
-        cursor.execute('UPDATE images SET setting = ? WHERE imageID = ?', (new_privacy, image_id))
+        cursor.execute('UPDATE images SET setting = %s WHERE imageID = %s', (new_privacy, image_id))
         conn.commit()
 
         cursor.close()
         conn.close()
 
-        return redirect('/view/id/' + new_privacy + '/' + str(image_id))
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    image_info = cursor.execute('SELECT * FROM images WHERE imageID = ?', (image_id,)).fetchall()
+        return redirect('/view/id/' + str(image_id))
 
     cursor.close()
     conn.close()
 
-    if ((not image_info[0][0] == session['username']) and (image_info[0][2] == "private")):
+    if ((not image_info[0][0] == session['username']) and (privacy == "private")):
         return redirect('/home')
 
-    return render_template('index.html')
+    curr_date = image_info[0][4].strftime("%m/%d/%Y")
+
+    return render_template('index.html', view_privacy = privacy, image_owner = image_info[0][0], view_date = curr_date)
 
 @app.route("/logout")
 def logout():
@@ -492,3 +599,37 @@ def CreateMosaic(target_image, input_images, resolution):
         MOSAIC.paste(output_images[i], (col * width, row * height))
 
     return MOSAIC
+
+#======================================================================================================
+
+class RandomDownloader(ImageDownloader):
+
+    def get_filename(self, task, default_ext):
+        filename = super(RandomDownloader, self).get_filename(
+            task, default_ext)
+        global key
+        filename = key + ".jpg"
+        return filename
+
+def RandomImageScrape(key_word=None):
+    google_crawler = GoogleImageCrawler(
+        downloader_cls=RandomDownloader,
+        storage={'root_dir': 'static'})
+
+    if not key_word:
+        r = RandomWords()
+        global key
+        key = r.get_random_word(
+            hasDictionaryDef="true",
+            includePartOfSpeech="noun, adverb",
+            minCorpusCount=1,
+            maxCorpusCount=100)
+        google_crawler.crawl(keyword=key, max_num=1) 
+        image = key + ".jpg"
+    else:
+        key = key_word
+        google_crawler.crawl(keyword=key, max_num=1) 
+
+        image = key + ".jpg"
+
+    return image

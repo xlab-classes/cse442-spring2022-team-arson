@@ -199,7 +199,6 @@ img {
     border: 15px solid #A38A6E;
     box-sizing: border-box;
 
-    z-index: -1;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -284,4 +283,12 @@ img {
     height: 258px;
     width: 270px;
     display: inline-block;
+    object-fit: cover;
+}
+
+.homeimages {
+    height: 258px;
+    width: 261px;
+    display: inline-block;
+    object-fit: cover;
 }

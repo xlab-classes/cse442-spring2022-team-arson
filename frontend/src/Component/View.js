@@ -8,31 +8,31 @@ import { useParams } from 'react-router-dom';
 // import {Link} from "react-router-dom";
 
 const View = () => {
-    const privacy = useParams();
-    const fprivacy = privacy.privacy.toUpperCase();
+    const {id} = useParams();
+    const privacy = window.view_privacy.toUpperCase();
 
     return (
         <div className={view.view}>
             <header className={view.header}>
                 <Rectangles2/>
-                <div className={view.logo}> <img src={logo} alt="logo"/></div>
+                <img className = {view.logo} src={logo} alt="logo"/>
                 <div className={view.titleBG}></div>
                 <text className = {view.BannerText}>Mosaic Maker</text>
                 <div className = {view.Border}></div>
             </header>
 
             <div className = {view.imageBox}>
-                <img className = {view.fImage} src={`/id/${privacy.id}`} alt="User Post"></img>
+                <img className = {view.fImage} src={`/id/${id}`} alt="User Post"></img>
             </div>
 
             <div className = {view.infoBox}>
-                <text className = {view.infoText}>Uploaded by: username</text> <br></br>
-                <text className = {view.infoText}>Created: MM/DD/YYYY</text> <br></br>
-                <text className = {view.infoText}>({privacy.privacy})</text>
+                <text className = {view.infoText}>Uploaded by: <a href = {`/profile/${window.view_username}`} className = {view.a}>{window.view_username}</a></text> <br></br>
+                <text className = {view.infoText}>Created: {window.view_date}</text> <br></br>
+                <text className = {view.infoText}>({window.view_privacy})</text>
             </div>
 
             <div className = {view.privacyButton}>
-                <text className = {view.privacyText}>{fprivacy}</text>
+                <text className = {view.privacyText}>{privacy}</text>
             </div>
 
             <form method = "post">

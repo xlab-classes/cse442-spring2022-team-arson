@@ -64,7 +64,7 @@ class Profile extends React.Component {
 
     componentDidMount(){
         // Load from flask api the images...
-        fetch('/profile/images', {credentials: 'include'})
+        fetch(`/profile/images/${window.profile_user}`, {credentials: 'include'})
             .then(res => res.json())
             .then(
                 (result) => {
@@ -120,6 +120,33 @@ class Profile extends React.Component {
         return (
             <>
             <RenderProfile />
+
+            <div className = "savedImages"></div>
+            <text className = "savedText">SAVED IMAGES</text>
+            <div className = "imageBox">
+                {/* Generate img tags from this.results up to 10 user can click button to load more */}
+                {/* Make sure images are within the bound */}
+                {/* Can load more */}
+                {/* Form Submission -> Results Public -> View Id Public */}
+                {/* Form Subbmision to /home/upload saves images redirects to moscaicify */}
+                {/* Image sizes are severly effecting perf */}
+                {/* {this.state.results.map((image) => <div> image.imageID </div>)} */}
+                {this.state.results.map (
+                    (image) =>
+                        <div className= "image">
+                            <a href = {`/view/id/${image.imageID}`}>
+                                <img src={`/id/${image.imageID}`} alt={`${image.imageID}`} className="images"/>
+                            </a>
+                        </div>
+                    )
+                }
+            </div>
+
+            { this.state.results.length == this.state.filtered.length
+            ? <text className='load'> Nothing to load </text>
+            : <button className="load" onClick='this.load()'> Load More </button> 
+            }
+
             <text className = "filterLabel">FILTER:</text>
             <div className = "filterMenu"></div>
             <div className = "filterChoice" onClick={this.handleDropDown}>
@@ -143,24 +170,6 @@ class Profile extends React.Component {
                     {/* <button onClick={() => this.sortRandom()}>Random</button> */}
                 </div>
             </div>
-
-            <div className = "savedImages"></div>
-            <text className = "savedText">SAVED IMAGES</text>
-            <div className = "imageBox">
-                {/* Generate img tags from this.results up to 10 user can click button to load more */}
-                {/* Make sure images are within the bound */}
-                {/* Can load more */}
-                {/* Form Submission -> Results Public -> View Id Public */}
-                {/* Form Subbmision to /home/upload saves images redirects to moscaicify */}
-                {/* Image sizes are severly effecting perf */}
-                {/* {this.state.results.map((image) => <div> image.imageID </div>)} */}
-                {this.state.results.map((image) => <div className= "image"> <img src={`/id/${image.imageID}`} alt={`${image.imageID}`} className="images"/> </div> )}
-            </div>
-
-            { this.state.results.length == this.state.filtered.length
-            ? <text className='load'> Nothing to load </text>
-            : <button className="load" onClick='this.load()'> Load More </button> 
-            }
 
             <Menu />
             </>

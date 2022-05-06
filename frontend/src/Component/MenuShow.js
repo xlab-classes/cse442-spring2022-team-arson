@@ -8,25 +8,25 @@ class MenuShow extends React.Component {
     return (
         <div className={menu2.testing}>
           {/*Link to home*/}
-          <a href = '/home'>
+          <a href = '/home' className='a'>
             <div className={menu2.Rectangle1}>
               <text className={menu2.Home}>HOME</text>
             </div>
           </a>
           {/*Link to profile*/}
-          <a href = '/myprofile'>
+          <a href = '/myprofile' className='a'>
             <div className={menu2.Rectangle2}>
               <text className={menu2.Profile}>PROFILE</text>
             </div>
           </a>
           {/*Link to settings*/}
-          <a href = '/settings'>
+          <a href = '/settings' className='a'>
             <div className={menu2.Rectangle3}>
               <text className={menu2.Settings}>SETTINGS</text>
             </div>
           </a>
           {/*Link to landing page*/}
-          <a href = '/logout'>
+          <a href = '/logout' className='a'>
             <div className={menu2.Rectangle4}>
               <text className={menu2.Logout}>LOG OUT</text>
             </div>

@@ -29,7 +29,7 @@ function App() {
               <Route path = "/settings" element = {<Settings />} />
               <Route path = "/settings/updated" element = {<SettingsUpdate />} />
               <Route path = "/results/:privacy/:userimage" element = {<Results />} />
-              <Route path = "/view/id/:privacy/:id" element = {<View />} />
+              <Route path = "/view/id/:id" element = {<View />} />
           </Routes>
       </Router>
     </>
