@@ -94,7 +94,7 @@ class Home extends React.Component {
                       (image) =>
                           <div className= "image">
                               <a href = {`/view/id/${image.imageID}`}>
-                                  <img src={`/id/${image.imageID}`} alt={`${image.imageID}`} className="images"/>
+                                  <img src={`/id/${image.imageID}`} alt={`${image.imageID}`} className="homeimages"/>
                               </a>
                           </div>
                       )
