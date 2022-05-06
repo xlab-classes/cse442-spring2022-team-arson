@@ -124,7 +124,6 @@ def home_keyword():
         privacy = request.form['privacy']
 
         if keyword and privacy:
-            print(keyword)
             image = RandomImageScrape(keyword)
             return redirect('/mosaicify/' + privacy + '/' + image)
             
@@ -147,6 +146,26 @@ def home_random():
         print("image status: " + privacy)
 
     return render_template("index.html")
+
+@app.route("/home/images")
+def getRecentImages():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT * FROM images WHERE setting = %s ORDER BY imageID DESC', ("public",))
+    allImages = cursor.fetchall()
+    recentImages = allImages[:10]
+
+    home_dictionary = []
+    for image in recentImages:
+        entry = {}
+        entry['imageID'] = image[1]
+        home_dictionary.append(entry)
+
+    cursor.close()
+    conn.close()
+
+    return json.dumps(home_dictionary)
 
 @app.route("/myprofile")
 def profile_redirect():
@@ -184,10 +203,17 @@ def profileimages(user):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Grab from new table here
-    cursor.execute('SELECT * FROM images WHERE username = %s', (user,))
-    userimages = cursor.fetchall()
-    # print(userimages)
+    if session['username'] == user:
+        # Grab from new table here
+        cursor.execute('SELECT * FROM images WHERE username = %s', (user,))
+        userimages = cursor.fetchall()
+        # print(userimages)
+    
+    else:
+        # Grab from new table here
+        cursor.execute('SELECT * FROM images WHERE username = %s AND setting = %s', (user, "public"))
+        userimages = cursor.fetchall()
+        # print(userimages)
 
     # Create metadata if not any
     for images in userimages:

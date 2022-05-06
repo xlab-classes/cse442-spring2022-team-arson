@@ -26,7 +26,7 @@ const View = () => {
             </div>
 
             <div className = {view.infoBox}>
-                <text className = {view.infoText}>Uploaded by: <a href = {`/profile/${window.view_username}`}>{window.view_username}</a></text> <br></br>
+                <text className = {view.infoText}>Uploaded by: <a href = {`/profile/${window.view_username}`} className = {view.a}>{window.view_username}</a></text> <br></br>
                 <text className = {view.infoText}>Created: {window.view_date}</text> <br></br>
                 <text className = {view.infoText}>({window.view_privacy})</text>
             </div>

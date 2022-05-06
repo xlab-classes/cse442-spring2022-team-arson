@@ -98,6 +98,12 @@
     color: #65523D;
   }
 
-a {
+.a, .a:link, a:visited {
   text-decoration: none;
+  color: #000000;
+}
+
+.a:hover {
+  text-decoration: underline;
+  color: #000000;
 }
