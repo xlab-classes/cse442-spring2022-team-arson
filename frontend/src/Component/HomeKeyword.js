@@ -8,12 +8,28 @@ import Rectangles2 from './rectangles2';
 import {Link} from "react-router-dom";
 
 class HomeKeyword extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
+      results: [],
       name: "React"
     };
     this.onChangeValue = this.onChangeValue.bind(this);
+  }
+
+  componentDidMount(){
+    // Load from flask api the images...
+    fetch(`/home/images`, {credentials: 'include'})
+        .then(res => res.json())
+        .then(
+            (result) => {
+                this.setState({
+                    results : result
+                })
+                console.log(result)
+            },
+            (error) => {}
+        )
   }
 
   onChangeValue(event) {
@@ -77,7 +93,17 @@ class HomeKeyword extends React.Component {
                       <text className={home.recentimagestext}>RECENT IMAGES</text>
                     </div>
                   </div>
-                  <div className={home.recentimagesBG}></div>
+                  <div className={home.recentimagesBG}>
+                    {this.state.results.map (
+                      (image) =>
+                          <div className= "image">
+                              <a href = {`/view/id/${image.imageID}`}>
+                                  <img src={`/id/${image.imageID}`} alt={`${image.imageID}`} className="images"/>
+                              </a>
+                          </div>
+                      )
+                    }
+                  </div>
                 </div>
                 <Menu />
             </div>
