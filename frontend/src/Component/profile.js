@@ -55,12 +55,6 @@ class Profile extends React.Component {
     // Gotta load the first ~6 12 
     // Change resolution of the images for better perf
     // Canvas interactive element
-    // Session flask or SessionStorage?
-    // TODO: Need to get username
-
-    // d = new Date(0)
-    // d.setUTCSeconds(utcSeconds)
-    // filterNone()
 
     componentDidMount(){
         // Load from flask api the images...
@@ -69,6 +63,7 @@ class Profile extends React.Component {
             .then(
                 (result) => {
                     this.setState({
+                        filtered: result,
                         results : result
                     })
                     console.log(result)
@@ -81,9 +76,19 @@ class Profile extends React.Component {
     // process and filter
     filterDate(elapsedday){
         console.log(`Filtering ${elapsedday}`)
-        var filteritems = this.state.items.filter((item) => item.date > "0") 
-        console.log(filteritems)
-        this.setState({filtered: filteritems})
+        // Filter the filtered and apply it to results and sort again
+        this.setState((previous) => {
+            return {results: previous.filtered.filter((item) => {
+                var createtime = new Date(0)
+                createtime.setUTCSeconds(item.ctime)
+                var elapsed = new Date(Date.now() - elapsedday * 24 * 60 * 60 * 1000)  
+                return createtime > elapsed
+            })}
+        })
+
+        var text = document.getElementById("textSort")
+        text.textContent = "Date"
+        this.sortDate()
     }
     
     sortDate(){
@@ -95,26 +100,9 @@ class Profile extends React.Component {
     sortSize(){
         console.log("Sorting Size")
         // this.setState((previous)=>{results: previous.results.sort((a,b) => {return a.size - b.size})})
-        this.setState((previous)=>{ return {results: previous.results.sort((a,b) => {return a.size - b.size})}})
+        this.setState((previous)=>{ return {results: previous.results.sort((a,b) => {return b.size - a.size})}})
         console.log(this.state.results)
     }
-    
-    
-    load(a,b){
-        // Get new refults then Sort 
-        var newResults = this.filtered.slice(0,this.results.length + 6)
-        this.setState({results:newResults})
-    }
-
-    // reapply sort everytime its filtered...
-    // .length
-    // loadmore button
-    // filter -> sort -> load
-    // sort -> current stuff
-    // load -> load and sort
-    // When you filter you have to resort...?
-    // Also when you load more you have to resort
-    // Perhaps make it a callback? sort callback? on handle Dropdown? onClick?
 
     render () {
         return (
@@ -142,17 +130,12 @@ class Profile extends React.Component {
                 }
             </div>
 
-            { this.state.results.length == this.state.filtered.length
-            ? <text className='load'> Nothing to load </text>
-            : <button className="load" onClick='this.load()'> Load More </button> 
-            }
-
             <text className = "filterLabel">FILTER:</text>
             <div className = "filterMenu"></div>
             <div className = "filterChoice" onClick={this.handleDropDown}>
                 <text> None </text>
                 <div className = "dropDown">
-                    <button onClick={() => this.filterDate(1000000000)}> None </button>
+                    <button onClick={() => this.filterDate(365*100)}> None </button>
                     <button onClick={() => this.filterDate(1)}> &lt; Day </button>
                     <button onClick={() => this.filterDate(7)}> &lt; Week </button>
                     <button onClick={() => this.filterDate(31)}> &lt; Month </button>
@@ -163,7 +146,7 @@ class Profile extends React.Component {
             <text className = "sortLabel">SORT:</text>
             <div className = "sortMenu"></div>
             <div className = "sortChoice" onClick={this.handleDropDown}>
-                <text> Date </text>
+                <text id="textSort"> Date </text>
                 <div className = "dropDown">
                     <button onClick={() => this.sortDate()}>Date</button>
                     <button onClick={() => this.sortSize()}>Size</button>
