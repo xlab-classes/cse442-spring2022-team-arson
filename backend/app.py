@@ -18,6 +18,7 @@ app = Flask(__name__)
 
 folder_path = 'static/images/'
 app.config['UPLOAD_FOLDER'] = folder_path
+app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.png']
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.secret_key = "amongus" # change to urandom later
 PIL.Image.MAX_IMAGE_PIXELS = 999999999
@@ -107,9 +108,9 @@ def home_upload():
         return redirect('/')
 
     if request.method == "POST":
-        privacy = request.form['privacy']
+        privacy = request.form['privacy']        
         image = request.files['img']
-        
+ 
         if image and privacy:
             image.save(os.path.join('static', image.filename))
             return redirect('/mosaicify/' + privacy + '/' + image.filename)
@@ -394,7 +395,16 @@ def mosaicify(privacy, user_image):
     image_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', filename))
     
     # image to be mosaic'd
-    target_image = Image.open(image_path)
+    try:
+        target_image = Image.open(image_path)
+    except:
+        return redirect('/home/upload')
+
+    # ensure image is correct colorspace
+    target_image = target_image.convert('RGB')
+    
+    # remove uploaded image
+    os.remove(image_path)
 
     # images to tile
     input_images = getImages(folder_path)
@@ -439,6 +449,7 @@ def mosaicify(privacy, user_image):
 
     output_mosaic.thumbnail((   (target_image.size[0] * 5),  (target_image.size[1] * 5)), Image.LANCZOS)
     output_mosaic.save(link)
+
     if image_num == "":
         return redirect('/results/' + privacy + "/" + final_new_img + "/0")
     return redirect('/results/' + privacy + "/" + final_new_img + "/" + image_num)
