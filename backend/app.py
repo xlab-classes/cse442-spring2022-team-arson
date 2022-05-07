@@ -6,7 +6,7 @@ from PIL import Image
 import numpy as np
 import urllib.request
 import datetime
-from flask import (Flask, render_template, request, redirect, send_from_directory, session)
+from flask import (Flask, render_template, request, redirect, send_from_directory, session, send_file)
 from werkzeug.utils import secure_filename
 from icrawler.builtin import GoogleImageCrawler
 from icrawler import ImageDownloader
@@ -34,6 +34,9 @@ def get_db_connection():
 
 @app.route("/")
 def index():
+    if not session.get('username') is None:
+        return redirect('/home')
+
     return render_template("index.html")
 
 @app.route("/login", methods = ('GET', 'POST'))
@@ -85,7 +88,7 @@ def signup():
 
 @app.route("/home", methods = ('GET', 'POST'))
 def home():
-    if session['username'] == "":
+    if session.get('username') is None:
         return redirect('/')
 
     if request.method == "POST":
@@ -100,8 +103,7 @@ def home():
 
 @app.route("/home/upload", methods = ('GET', 'POST'))
 def home_upload():
-
-    if session['username'] == "":
+    if session.get('username') is None:
         return redirect('/')
 
     if request.method == "POST":
@@ -116,7 +118,7 @@ def home_upload():
 
 @app.route("/home/keyword", methods = ('GET', 'POST'))
 def home_keyword():
-    if session['username'] == "":
+    if session.get('username') is None:
         return redirect('/')
 
     if request.method == "POST":
@@ -131,7 +133,7 @@ def home_keyword():
 
 @app.route("/home/random", methods = ('GET', 'POST'))
 def home_random():
-    if session['username'] == "":
+    if session.get('username') is None:
         return redirect('/')
 
     if request.method == "POST":
@@ -154,7 +156,7 @@ def getRecentImages():
 
     cursor.execute('SELECT * FROM images WHERE setting = %s ORDER BY imageID DESC', ("public",))
     allImages = cursor.fetchall()
-    recentImages = allImages[:10]
+    recentImages = allImages[:12]
 
     home_dictionary = []
     for image in recentImages:
@@ -167,16 +169,32 @@ def getRecentImages():
 
     return json.dumps(home_dictionary)
 
+@app.route("/downloadImage/<imageID>")
+def downloadImage(imageID):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT imageName FROM images WHERE imageID = %s', (imageID,))
+    imageName = cursor.fetchall()
+
+    link = os.path.join('static', imageName[0][0])
+    return send_file(link, as_attachment = True)
+
+@app.route("/downloadResult/<imageName>")
+def downloadResult(imageName):
+    link = os.path.join('static', imageName)
+    return send_file(link, as_attachment = True)
+
 @app.route("/myprofile")
 def profile_redirect():
-    if session['username'] == "":
+    if session.get('username') is None:
         return redirect('/')
 
     return redirect('/profile/' + session['username'])
 
 @app.route("/profile/<user>")
 def profile(user):
-    if not session['username']:
+    if session.get('username') is None:
         return redirect('/')
 
     conn = get_db_connection()
@@ -251,7 +269,7 @@ def profileimages(user):
 
 @app.route("/settings", methods = ('GET', 'POST'))
 def settings():
-    if session['username'] == "":
+    if session.get('username') is None:
         return redirect('/')
 
     if request.method == "POST":
@@ -276,6 +294,7 @@ def settings():
             elif not newPass1 == newPass2:
                 return redirect('/settings')
             cursor.execute('UPDATE users SET username = %s, pass = %s WHERE username = %s', (newUser1, newPass1, session['username']))
+            cursor.execute('UPDATE images SET username = %s WHERE username = %s', (newUser1, session['username']))
             conn.commit()
             session['username'] = newUser1
             return redirect('/settings/updated')
@@ -290,6 +309,7 @@ def settings():
                 return redirect('/settings')
 
             cursor.execute('UPDATE users SET username = %s WHERE username = %s', (newUser1, session['username']))
+            cursor.execute('UPDATE images SET username = %s WHERE username = %s', (newUser1, session['username']))
             conn.commit()
             session['username'] = newUser1
             return redirect('/settings/updated')
@@ -310,7 +330,7 @@ def settings():
 
 @app.route("/settings/updated", methods = ('GET', 'POST'))
 def settings_updated():
-    if session['username'] == "":
+    if session.get('username') is None:
         return redirect('/')
 
     if request.method == "POST":
@@ -367,8 +387,7 @@ def settings_updated():
 
 @app.route("/mosaicify/<privacy>/<user_image>")
 def mosaicify(privacy, user_image):
-
-    if session['username'] == "":
+    if session.get('username') is None:
         return redirect('/')
 
     filename = user_image
@@ -396,16 +415,37 @@ def mosaicify(privacy, user_image):
     print('Mosaic Complete!')
 
     img_name = user_image.split('.')
-    new_img = img_name[0] + '_out.' + img_name[1]
-    link = os.path.join('static', new_img)
+    new_img = "".join(img_name[:len(img_name) - 1]) + '_out.' + img_name[len(img_name) - 1]
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT * FROM images WHERE imageName = %s', (new_img,))
+    poss_images = cursor.fetchall()
+
+    image_num = ""
+
+    if len(poss_images) > 0:
+        cursor.execute('SELECT MAX(num) FROM images WHERE imageName = %s', (new_img,))
+        image_num = str(cursor.fetchall()[0][0] + 1)
+    
+    cursor.close()
+    conn.close()
+
+    final_new_img = "".join(img_name[:len(img_name) - 1]) + '_out' + image_num + '.' + img_name[len(img_name) - 1]
+    print(final_new_img)
+
+    link = os.path.join('static', final_new_img)
 
     output_mosaic.thumbnail((   (target_image.size[0] * 5),  (target_image.size[1] * 5)), Image.LANCZOS)
     output_mosaic.save(link)
-    return redirect('/results/' + privacy + "/" + new_img)
+    if image_num == "":
+        return redirect('/results/' + privacy + "/" + final_new_img + "/0")
+    return redirect('/results/' + privacy + "/" + final_new_img + "/" + image_num)
 
-@app.route("/results/<privacy>/<user_image>", methods = ('GET', 'POST'))
-def results(privacy, user_image):
-    if session['username'] == "":
+@app.route("/results/<privacy>/<user_image>/<image_num>", methods = ('GET', 'POST'))
+def results(privacy, user_image, image_num):
+    if session.get('username') is None:
         return redirect('/')
 
     if request.method == "POST":
@@ -418,7 +458,10 @@ def results(privacy, user_image):
 
         curr_date = date.today()
 
-        cursor.execute('INSERT INTO images (username, imageID, setting, imageName, date) VALUES (%s, %s, %s, %s, %s)', (session['username'], newID, privacy, user_image, curr_date))
+        if image_num == "":
+            cursor.execute('INSERT INTO images (username, imageID, setting, imageName, num, date) VALUES (%s, %s, %s, %s, %s, %s)', (session['username'], newID, privacy, user_image, 0, curr_date))
+        else:
+            cursor.execute('INSERT INTO images (username, imageID, setting, imageName, num, date) VALUES (%s, %s, %s, %s, %s, %s)', (session['username'], newID, privacy, user_image, image_num, curr_date))
         
         conn.commit()
         cursor.close()
@@ -429,15 +472,15 @@ def results(privacy, user_image):
     return render_template('index.html')
 
 @app.route('/image/<path:filename>') 
-def send_file(filename):
-    if session['username'] == "":
+def sendfile(filename):
+    if session.get('username') is None:
         return redirect('/')
 
     return send_from_directory('static', filename)
 
 @app.route('/id/<int:imageID>') 
-def send_file2(imageID):
-    if session['username'] == "":
+def sendfile2(imageID):
+    if session.get('username') is None:
         return redirect('/')
 
     conn = get_db_connection()
@@ -456,7 +499,7 @@ def send_file2(imageID):
 
 @app.route("/view/id/<int:image_id>", methods = ('GET', 'POST'))
 def view(image_id):
-    if session['username'] == "":
+    if session.get('username') is None:
         return redirect('/')
 
     conn = get_db_connection()
@@ -489,13 +532,17 @@ def view(image_id):
     if ((not image_info[0][0] == session['username']) and (privacy == "private")):
         return redirect('/home')
 
-    curr_date = image_info[0][4].strftime("%m/%d/%Y")
+    curr_date = image_info[0][5].strftime("%m/%d/%Y")
 
     return render_template('index.html', view_privacy = privacy, image_owner = image_info[0][0], view_date = curr_date)
 
 @app.route("/logout")
 def logout():
-    session['username'] = ""
+    session['username'] = None
+    return redirect('/')
+
+@app.errorhandler(404)
+def page_not_found(e):
     return redirect('/')
 
 #======================================================================================================
