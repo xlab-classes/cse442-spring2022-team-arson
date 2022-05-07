@@ -394,6 +394,11 @@ def mosaicify(privacy, user_image):
     filename = user_image
     image_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', filename))
     
+    img_name = user_image.split('.')
+    if not(img_name[len(img_name) - 1] == "png" or img_name[len(img_name) - 1] == "jpg" or img_name[len(img_name) - 1] == "jpeg"):
+        os.remove(image_path)
+        return redirect('/home')
+
     # image to be mosaic'd
     try:
         target_image = Image.open(image_path)
@@ -424,7 +429,6 @@ def mosaicify(privacy, user_image):
     output_mosaic = CreateMosaic(target_image, input_images, resolution)
     print('Mosaic Complete!')
 
-    img_name = user_image.split('.')
     new_img = "".join(img_name[:len(img_name) - 1]) + '_out.' + img_name[len(img_name) - 1]
 
     conn = get_db_connection()
