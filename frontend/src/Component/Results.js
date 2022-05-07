@@ -33,9 +33,11 @@ const Results = () => {
                     </button>
                 </form>
 
-                <button className = {results.downloadButton}>
-                    <text className = {results.downloadText}>DOWNLOAD</text>
-                </button>
+                <a href = {`/downloadResult/${userimage.userimage}`}>
+                    <button className = {results.downloadButton}>
+                        <text className = {results.downloadText}>DOWNLOAD</text>
+                    </button>
+                </a>
                 
                 <Menu />
             </div>
