@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/web/CSE442-542/2022-Spring/cse-442u/flask-react/backend/venv"
+VIRTUAL_ENV="/web/CSE442-542/2022-Spring/cse-442u/cse442-spring2022-team-arson/backend/venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

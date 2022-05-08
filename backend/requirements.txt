@@ -1,2 +1,9 @@
 exif
 Pillow
+Flask
+numpy
+icrawler
+random_word
+pyyaml
+flask_mysql_connector
+gunicorn

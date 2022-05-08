@@ -26,7 +26,7 @@ const View = () => {
             </div>
 
             <div className = {view.infoBox}>
-                <text className = {view.infoText}>Uploaded by: <a href = {`/profile/${window.view_username}`} className = {view.a}>{window.view_username}</a></text> <br></br>
+                <text className = {view.infoText}>Uploaded by: <a href = {`/profile/${window.view_username}`} className={view.a}>{window.view_username}</a></text> <br></br>
                 <text className = {view.infoText}>Created: {window.view_date}</text> <br></br>
                 <text className = {view.infoText}>({window.view_privacy})</text>
             </div>
@@ -43,13 +43,11 @@ const View = () => {
                 <button className={view.update} type = "submit">UPDATE</button>
             </form>
 
-            <button className = {view.downloadButton}>
-                <text className = {view.downloadText}>DOWNLOAD</text>
-            </button>
-            
-            <button className = {view.shareButton}>
-                <text className = {view.shareText}>WIP</text>
-            </button>
+            <a href = {`/downloadImage/${id}`}>
+                <button className = {view.downloadButton}>
+                    <text className = {view.downloadText}>DOWNLOAD</text>
+                </button>
+            </a>
 
             <Menu />
         </div>

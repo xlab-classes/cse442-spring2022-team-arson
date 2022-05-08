@@ -29,7 +29,7 @@ end
 # unset irrelevant variables
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/web/CSE442-542/2022-Spring/cse-442u/flask-react/backend/venv"
+set -gx VIRTUAL_ENV "/web/CSE442-542/2022-Spring/cse-442u/cse442-spring2022-team-arson/backend/venv"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH
