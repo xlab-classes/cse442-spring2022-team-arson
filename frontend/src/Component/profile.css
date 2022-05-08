@@ -116,6 +116,7 @@ img {
     font-size: 36px;
     line-height: 47px;
     color: #FFFFFF;
+    cursor: pointer;
 }
 
 .sortLabel {
@@ -156,6 +157,7 @@ img {
     font-size: 36px;
     line-height: 47px;
     color: #FFFFFF;
+    cursor: pointer;
 }
 
 
@@ -270,6 +272,7 @@ img {
     color: #FFFFFF;
     background: #65523d;
     width: 183px;
+    cursor: pointer;
 }
 
 
