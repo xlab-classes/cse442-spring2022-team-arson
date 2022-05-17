@@ -1,9 +1,9 @@
-import imghdr
 import json
 import os
 import PIL
 from PIL import Image
 import numpy as np
+import math
 import urllib.request
 import datetime
 from flask import (Flask, render_template, request, redirect, send_from_directory, session, send_file)
@@ -18,7 +18,6 @@ app = Flask(__name__)
 
 folder_path = 'static/images/'
 app.config['UPLOAD_FOLDER'] = folder_path
-app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.png']
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.secret_key = "amongus" # change to urandom later
 PIL.Image.MAX_IMAGE_PIXELS = 999999999
@@ -108,9 +107,9 @@ def home_upload():
         return redirect('/')
 
     if request.method == "POST":
-        privacy = request.form['privacy']        
+        privacy = request.form['privacy']
         image = request.files['img']
- 
+        
         if image and privacy:
             image.save(os.path.join('static', image.filename))
             return redirect('/mosaicify/' + privacy + '/' + image.filename)
@@ -394,41 +393,41 @@ def mosaicify(privacy, user_image):
     filename = user_image
     image_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'static', filename))
     
-    img_name = user_image.split('.')
-    if not(img_name[len(img_name) - 1] == "png" or img_name[len(img_name) - 1] == "jpg" or img_name[len(img_name) - 1] == "jpeg"):
-        os.remove(image_path)
-        return redirect('/home')
-
     # image to be mosaic'd
-    try:
-        target_image = Image.open(image_path)
-    except:
-        return redirect('/home/upload')
-
-    # ensure image is correct colorspace
-    target_image = target_image.convert('RGB')
-    
-    # remove uploaded image
-    os.remove(image_path)
+    target_image = Image.open(image_path)
 
     # images to tile
-    input_images = getImages(folder_path)
+    input_images = []
+    images_folder = os.listdir(folder_path)
 
-    # size of grid 
+    for file in images_folder:
+        # get absolute path of image, need to join with /images/filename
+        file_path = os.path.abspath(os.path.join(folder_path, file))
+        try:
+            fp = open(file_path, "rb")
+            img = Image.open(fp)
+            img.load()
+            input_images.append(img)
+            fp.close()      # best practice to close file after
+        except Exception:
+            print(f"Error loading image: {file}")
+
+
+    # size of grid (value just from trial and error, might make this variable)
     resolution = (64, 64)
-    # resolution = (256, 256)
 
-    # get largest image in input images
+    # get largest image in input images for dimensions
     largest_image = max(input_images, key=lambda x: x.size[0] * x.size[1])
 
+    #resize images so they're more even when combining
     for img in input_images:
-        # img = img.resize((target_image.size[0] // resolution[0], target_image.size[1] // resolution[1]), Image.LANCZOS)
-        # img.resize((target_image.size[0] // resolution[0], target_image.size[1] // resolution[1]), Image.LANCZOS)
         img.thumbnail((target_image.size[0] // resolution[0], target_image.size[1] // resolution[1]), Image.LANCZOS)
 
     output_mosaic = CreateMosaic(target_image, input_images, resolution)
     print('Mosaic Complete!')
 
+
+    img_name = user_image.split('.')
     new_img = "".join(img_name[:len(img_name) - 1]) + '_out.' + img_name[len(img_name) - 1]
 
     conn = get_db_connection()
@@ -453,7 +452,6 @@ def mosaicify(privacy, user_image):
 
     output_mosaic.thumbnail((   (target_image.size[0] * 5),  (target_image.size[1] * 5)), Image.LANCZOS)
     output_mosaic.save(link)
-
     if image_num == "":
         return redirect('/results/' + privacy + "/" + final_new_img + "/0")
     return redirect('/results/' + privacy + "/" + final_new_img + "/" + image_num)
@@ -565,15 +563,15 @@ def page_not_found(e):
 def calcAverageRGB(image):
 
     img = np.array(image)
+    
+    # shape[0] - image width || shape[1] - image height || shape[2] - depth of colors, i.e. rgba = 4, rgb = 3
+    # create linear array of d-tuple (3 for rgb) for all pixels and average over each rgb tuple
+    img = img.reshape(img.shape[0]*img.shape[1], img.shape[2])
+    
+    # get component-wise rgb weighted average
+    return tuple(np.average(img, axis=0))
 
-    # w - image width || h - image height || d - depth of colors, i.e. rgba = 4, rgb = 3
-    w, h, d = img.shape
-
-    # get average
-    # create linear array of d-tuple (3 for rgb) with length w*h for all pixels and average over each rgb tuple
-    return tuple(np.average(img.reshape(w * h, d), axis=0))
-
-def tileImage(image, size):
+def tileImage(input_image, resolution):
     """
     _________________
     |_1_|_2_|_3_|_4_|
@@ -581,53 +579,42 @@ def tileImage(image, size):
     |_9_|_._|_._|_._|
     |_._|_._|_._|_._|
     |_._|_._|_._|_._|
-    gridify the image, return this as a list of individual images
+    tile the image, return this as a list of individual images
+
+    i,j         (i+1),j
+         ._____.
+         |     |  
+         |     |
+         L-----⅃
+    i,(j+1)     (i+1),(j+1)
     """
-    m, n = size
-    w, h = image.size[0] // n, image.size[1] // m
+    w, h = input_image.size[0] // resolution[1], input_image.size[1] // resolution[0]
     imgs = []
-    for j in range(m):
-        for i in range(n):
+    for j in range(resolution[0]):
+        for i in range(resolution[1]):
             chunk = image.crop((i * w, j * h, (i + 1) * w, (j + 1) * h))
             imgs.append(chunk)
     return imgs
 
-def getImages(imageDir):
-    files = os.listdir(imageDir)
-    imgs = []
-    for file in files:
-        # get absolute path of image, need to join with /images/filename
-        filePath = os.path.abspath(os.path.join(imageDir, file))
-        try:
-            fp = open(filePath, "rb")
-            im = Image.open(fp)
-            im.load()
-            imgs.append(im)
-            fp.close()
-        except Exception:
-            print(f"Error loading image: {file}")
-
-    # return a list of all the images in the folder
-    return imgs
-
 def findClosestMatch(input_avg, avgs):
 
-    index = 0                # current index
-    min_index = 0            # index of running min avg.
-    min_dist = float('inf')  # starting dist at infinity so first image check starts the tracking
+    index = 0               # current index
+    min_index = 0           # index of running min avg.
+    min_dist = math.inf     # starting dist at infinity so first image check starts the tracking
 
     # calculate euclidean distance w.r.t the RGB color-space (3-dim)
     # track the minimum distance to get the image w closest avg color
-    for sample in avgs:
-        dist = (((sample[0] - input_avg[0]) ** 2) +
-                ((sample[1] - input_avg[1]) ** 2) +
-                ((sample[2] - input_avg[2]) ** 2))
-        # if lower dist found, update min trackers
+    for sample, index in zip(avgs, range(len(avgs))):
+        dist = (
+            ((sample[0] - input_avg[0]) ** 2) + # R-value
+            ((sample[1] - input_avg[1]) ** 2) + # G-value
+            ((sample[2] - input_avg[2]) ** 2)   # B-value
+            )
+        
+        # if lower distance found, update min trackers
         if dist < min_dist:
             min_dist = dist
             min_index = index
-
-        index += 1
 
     return min_index
 
@@ -652,12 +639,13 @@ def CreateMosaic(target_image, input_images, resolution):
     # create new image with dimensions = mosaic resolution * largest of the images
     m, n = resolution
     width, height = max([img.size[0] for img in output_images]), max([img.size[1] for img in output_images])
-    MOSAIC = Image.new('RGB', size=(n * width, m * height))
+    MOSAIC = Image.new('RGB', size=(resolution[1] * width, resolution[0] * height))
 
     # tile images onto original image
+    # 1D/2D mapping -> i = n*row + col
     for i in range(len(output_images)):
-        row = int(i / n)
-        col = i - n * row
+        row = i // resolution[1]
+        col = i - resolution[1] * row
         MOSAIC.paste(output_images[i], (col * width, row * height))
 
     return MOSAIC
